@@ -14,13 +14,17 @@ defmodule Katex.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger]
+      applications: [:nadia],
+      extra_applications: [:logger],
+      mod: {Katex, []}
     ]
   end
 
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:nadia, "~> 0.6.0"},
+      {:bookish_spork, github: "tank-bohr/bookish_spork", only: :test}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]

@@ -1,18 +1,18 @@
 defmodule Katex do
-  @moduledoc """
-  Documentation for Katex.
-  """
+  use Application
 
-  @doc """
-  Hello world.
+  def start(_type, _args) do
+    update_provider =
+      case Application.get_env(:katex, :update_provider) do
+        :poller -> [{Katex.Poller, []}]
+        nil -> []
+      end
 
-  ## Examples
+    children = [
+      {Katex.CatChat, []}
+      | update_provider
+    ]
 
-      iex> Katex.hello()
-      :world
-
-  """
-  def hello do
-    :world
+    Supervisor.start_link(children, strategy: :one_for_one)
   end
 end
