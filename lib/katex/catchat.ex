@@ -43,9 +43,6 @@ defmodule Katex.CatChat.Supervisor do
 
   def get_chat(chat_id) do
     registry = Chat.registry_name
-    # l_result = Registry.lookup(registry, chat_id)
-    # IO.inspect(l_result)
-    # Logger.log(:info, chardata_or_fun, metadata \\ [])
     case Registry.lookup(registry, chat_id) do
       [{pid, _}] -> pid
       [] -> nil
@@ -59,10 +56,6 @@ defmodule Katex.CatChat.Supervisor do
   def stop_chat(chat_pid) do
     CatChats.stop_chat(chat_pid)
   end
-
-  # def stop_chat(chat_id) do
-
-  # end
 
 end
 
@@ -107,6 +100,7 @@ defmodule Katex.CatChat do
         CatSup.stop_chat(chat_pid)
       {nil, _text} -> nil
       {chat_pid, _text} ->
+        Logger.log(:info, "Finded #{chat_id} with pid #{inspect(chat_pid)}")
         GenServer.cast(chat_pid, {:process_message, message})
     end
 

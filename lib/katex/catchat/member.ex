@@ -1,5 +1,7 @@
 defmodule Katex.CatChat.Member do
+  alias Nadia.Model.User, as: NadiaUser
   alias __MODULE__, as: Member
+
   @type t() :: %Member{
     fname: String.t,
     sname: String.t,
@@ -12,9 +14,13 @@ defmodule Katex.CatChat.Member do
   def new(fname, sname, id) do
     %Member{fname: fname, sname: sname, id: id}
   end
-  @spec new(String.t, String.t, integer, integer, boolean) :: Member.t
+
   def new(fname, sname, id, karma, participant?) do
     %Member{fname: fname, sname: sname, id: id, karma: karma, participant?: participant?}
+  end
+
+  def new(%NadiaUser{first_name: fname, last_name: sname, id: id}) do
+    new(fname, sname, id)
   end
 
   @spec change_karma(Member.t(), :inc | :dec) :: Member.t()
@@ -34,4 +40,9 @@ defmodule Katex.CatChat.Member do
       karma < 3 -> :normal_karma
     end
   end
+
+  def boxed(%Member{id: id} = member) do
+    %{id => member}
+  end
+
 end

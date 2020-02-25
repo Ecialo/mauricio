@@ -9,7 +9,7 @@ defmodule KatexTest.Helpers do
   alias Nadia.Model.Chat, as: NadiaChat
   alias Nadia.Model.User, as: NadiaUser
 
-  alias Katex.CatChat.Chat
+  alias Katex.CatChat.{Chat, Cat, Member}
 
   def start_update do
     update_with_text(1, "/start")
@@ -93,14 +93,27 @@ defmodule KatexTest.Helpers do
     URI.query_decoder(body) |> Map.new()
   end
 
-  def assert_capture_expected_text(expected_text) do
-    request_text =
-      :bookish_spork.capture_request()
+  def body_of_captured_request() do
+    :bookish_spork.capture_request()
       |> elem(1)
       |> Map.fetch!(:body)
       |> body_to_dict()
+  end
+
+  def assert_capture_expected_text(expected_text) do
+    request_text =
+      body_of_captured_request()
       |> Map.fetch!("text")
-    assert request_text == expected_text
+    case expected_text do
+      :any -> true
+      text ->
+        assert request_text == text
+    end
+  end
+
+  def assert_capture_photo_or_animation() do
+    body = body_of_captured_request()
+    assert Map.has_key?(body, "photo") or Map.has_key?(body, "animation")
   end
 
   def assert_dialog(state, []) do
@@ -117,7 +130,5 @@ defmodule KatexTest.Helpers do
 
     assert_dialog(new_state, rest)
   end
-
-
 
 end
