@@ -1,4 +1,4 @@
-defprotocol Katex.CatChat.Cat.CatState do
+defprotocol Mauricio.CatChat.Cat.CatState do
 
   def pet(state, cat, who)
 
@@ -10,21 +10,23 @@ defprotocol Katex.CatChat.Cat.CatState do
 
   def eat(state, cat, who)
 
-  def hungry(state, cat, who)
+  def hungry(state, cat, feeder)
 
   def tire(state, cat, who)
 
   def pine(state, cat, who)
 
+  def metabolic(state, cat, who)
+
   def react_to_triggers(state, cat, who, triggers)
 
 end
 
-defmodule Katex.CatChat.Cat.State do
+defmodule Mauricio.CatChat.Cat.State do
 
-  alias Katex.CatChat.{Cat, Member}
-  alias Katex.Text
-  alias Katex.CatChat.Cat.State.{WantCare, Awake, Sleep}
+  alias Mauricio.CatChat.{Cat, Member}
+  alias Mauricio.Text
+  alias Mauricio.CatChat.Cat.State.{WantCare, Awake, Sleep}
 
   def state_dynamic_message(weight_dynamic, karma_level, cat_state) do
     case {weight_dynamic, karma_level, cat_state} do
@@ -76,13 +78,13 @@ defmodule Katex.CatChat.Cat.State do
     }
   end
 
-  def react_to_triggers(cat, %Member{participant?: false} = who, triggers) do
+  def react_to_triggers(_state, cat, %Member{participant?: false} = who, triggers) do
     if :attract in triggers do
       {cat, %{who | participant?: true}, Text.get_text(:attracted)}
     end
   end
 
-  def react_to_triggers(cat, who, triggers) do
+  def react_to_triggers(_state, cat, who, triggers) do
     collect = fn tr, {cat, who, msgs} ->
       {cat, who, msg} = react_to_trigger(tr, cat, who)
       {cat, who, [msg | msgs]}

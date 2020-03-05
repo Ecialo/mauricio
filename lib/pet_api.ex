@@ -10,8 +10,8 @@ defmodule PetAPI do
 
   def token(pet) do
     case pet do
-      :cat -> Application.get_env(:katex, :cat_api_token)
-      :dog -> Application.get_env(:katex, :dog_api_token)
+      :cat -> Application.get_env(:mauricio, :cat_api_token)
+      :dog -> Application.get_env(:mauricio, :dog_api_token)
     end
   end
 

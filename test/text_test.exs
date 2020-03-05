@@ -1,14 +1,14 @@
-defmodule KatexTest.CatTest do
+defmodule MauricioTest.TextTest do
   use ExUnit.Case
 
-  alias Katex.Text
-  alias Katex.CatChat.{Member, Cat}
+  alias Mauricio.Text
+  alias Mauricio.CatChat.{Member, Cat}
 
   test "triggers in text" do
     # КСтати - attract
     # сКУШай - eat
     # НЯшную - mew
-    # КОТлетку - eat
+    # КОТлетку - :cat
     # ! - loud
     text = """
     Кстати скушай няшную котлетку!

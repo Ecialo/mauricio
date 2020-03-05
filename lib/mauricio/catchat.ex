@@ -1,7 +1,7 @@
-defmodule Katex.CatChat.Chats do
+defmodule Mauricio.CatChat.Chats do
   use DynamicSupervisor
   require Logger
-  alias Katex.CatChat.Chat
+  alias Mauricio.CatChat.Chat
 
   def start_link(_arg) do
     DynamicSupervisor.start_link(__MODULE__, :ok, name: __MODULE__)
@@ -17,16 +17,16 @@ defmodule Katex.CatChat.Chats do
   end
 
   def stop_chat(chat_pid) do
-    DynamicSupervisor.terminate_child(__MODULE__, chat_pid)
+    GenServer.call(chat_pid, :stop)
   end
 
 end
 
 
-defmodule Katex.CatChat.Supervisor do
+defmodule Mauricio.CatChat.Supervisor do
   use Supervisor
-  alias Katex.CatChat.Chats, as: CatChats
-  alias Katex.CatChat.Chat
+  alias Mauricio.CatChat.Chats, as: CatChats
+  alias Mauricio.CatChat.Chat
 
   def start_link do
     Supervisor.start_link(__MODULE__, :ok, name: __MODULE__)
@@ -36,7 +36,7 @@ defmodule Katex.CatChat.Supervisor do
     registry_name = Chat.registry_name
     children = [
       {Registry, [keys: :unique, name: registry_name]},
-      {Katex.CatChat.Chats, []}
+      {Mauricio.CatChat.Chats, []}
     ]
     Supervisor.init(children, strategy: :one_for_all)
   end
@@ -59,12 +59,12 @@ defmodule Katex.CatChat.Supervisor do
 
 end
 
-defmodule Katex.CatChat do
+defmodule Mauricio.CatChat do
   use GenServer
 
   require Logger
 
-  alias Katex.CatChat.Supervisor, as: CatSup
+  alias Mauricio.CatChat.Supervisor, as: CatSup
   alias Nadia.Model.Update, as: NadiaUpdate
   alias Nadia.Model.Message, as: NadiaMessage
   alias Nadia.Model.Chat, as: NadiaChat
@@ -80,10 +80,7 @@ defmodule Katex.CatChat do
     CatSup.start_link()
   end
 
-  def handle_cast(
-    {:rout_update, %NadiaUpdate{message: message}},
-    catsup_pid
-  ) do
+  def handle_update(%NadiaUpdate{message: message}, mode) do
     %NadiaMessage{chat: chat, text: text} = message
     %NadiaChat{id: chat_id} = chat
 
@@ -95,25 +92,41 @@ defmodule Katex.CatChat do
       {nil, @start_command<>_rest} ->
         Logger.log(:info, "Start chat #{chat_id} by command #{text}")
         CatSup.start_chat(chat_id)
+        :ok
       {chat_pid, @stop_command<>_rest} when not is_nil(chat_pid) ->
         Logger.log(:info, "Stop chat #{chat_id} with pid #{inspect(chat_pid)} by command #{text}")
         CatSup.stop_chat(chat_pid)
-      {nil, _text} -> nil
+        :ok
+      {nil, _text} -> :ok
       {chat_pid, _text} ->
-        Logger.log(:info, "Finded #{chat_id} with pid #{inspect(chat_pid)}")
-        GenServer.cast(chat_pid, {:process_message, message})
+        Logger.log(:info, "Found #{chat_id} with pid #{inspect(chat_pid)}")
+        case mode do
+          :sync -> chat_pid
+          :async ->
+            GenServer.cast(chat_pid, {:process_message, message})
+            :ok
+        end
     end
+  end
 
+  def handle_cast({:process_update, update}, catsup_pid) do
+    handle_update(update, :async)
     {:noreply, catsup_pid}
   end
 
-  def handle_cast(request, pid) do
-    IO.inspect(request)
-    {:noreply, pid}
+  def handle_call({:process_update, update}, _from, catsup_pid) do
+    {:reply, handle_update(update, :sync), catsup_pid}
   end
 
-  def process_update(update) do
-    GenServer.cast(__MODULE__, {:rout_update, update})
+  def process_update(update, mode \\ :sync)
+  def process_update(update, :async),
+    do: GenServer.cast(__MODULE__, {:process_update, update})
+  def process_update(%NadiaUpdate{message: message} = update, :sync) do
+    case GenServer.call(__MODULE__, {:process_update, update}) do
+      :ok -> :ok
+      chat_pid ->
+        GenServer.call(chat_pid, {:process_message, message})
+    end
   end
-
+  
 end

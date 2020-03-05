@@ -1,4 +1,4 @@
-defmodule Katex.CatChat.Member do
+defmodule Mauricio.CatChat.Member do
   alias Nadia.Model.User, as: NadiaUser
   alias __MODULE__, as: Member
 
@@ -26,7 +26,7 @@ defmodule Katex.CatChat.Member do
   @spec change_karma(Member.t(), :inc | :dec) :: Member.t()
   def change_karma(member = %Member{karma: karma}, direction) do
     new_karma = case direction do
-      :inc -> min(karma + 1, Application.get_env(:katex, :max_karma))
+      :inc -> min(karma + 1, Application.get_env(:mauricio, :max_karma))
       :dec -> max(karma - 1, 0)
     end
     %{member | karma: new_karma}

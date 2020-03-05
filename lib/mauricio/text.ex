@@ -1,4 +1,4 @@
-defmodule Katex.Text do
+defmodule Mauricio.Text do
 
   @type trigger() ::
     :loud
@@ -20,8 +20,16 @@ defmodule Katex.Text do
     EEx.eval_string(source, opts)
   end
 
+  def get_all_texts(key, opts \\ []) do
+    template = get_template(key)
+    case template do
+      v when is_list(v) -> Enum.map(v, &(EEx.eval_string(&1, opts)))
+      v -> [EEx.eval_string(v, opts)]
+    end
+  end
+
   def get_template([key | rest]), do: get_template(get_template(key), rest)
-  def get_template(key), do: Application.get_env(:katex, :text)[key]
+  def get_template(key), do: Application.get_env(:mauricio, :text)[key]
   def get_template(template, []), do: template
   def get_template(template, [key | rest]) when is_map(template),
     do: get_template(template[key], rest)
@@ -33,7 +41,7 @@ defmodule Katex.Text do
   end
 
   def triggers(:all) do
-    Application.get_env(:katex, :triggers)
+    Application.get_env(:mauricio, :triggers)
   end
   def triggers(key) do
     triggers(:all)[key]

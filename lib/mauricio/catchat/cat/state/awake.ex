@@ -1,9 +1,9 @@
-defmodule Katex.CatChat.Cat.State.Awake do
+defmodule Mauricio.CatChat.Cat.State.Awake do
   alias __MODULE__, as: Awake
-  alias Katex.Text
-  alias Katex.CatChat.{Cat, Member}
-  alias Katex.CatChat.Cat.{State, CatState}
-  alias Katex.CatChat.Cat.State.{Sleep, Away, WantCare}
+  alias Mauricio.Text
+  alias Mauricio.CatChat.{Cat, Member}
+  alias Mauricio.CatChat.Cat.{State, CatState}
+  alias Mauricio.CatChat.Cat.State.{Sleep, Away, WantCare}
 
   defstruct []
   def new do
@@ -40,16 +40,42 @@ defmodule Katex.CatChat.Cat.State.Awake do
     end
   end
 
-  def tire(_state, %Cat{energy: {0, _}} = cat, who) do
-    {%{cat | state: Sleep.new}, who, Text.get_text(:fall_asleep, cat: cat, who: who)}
+  def tire(_state, %Cat{energy: 0} = cat, who) do
+    {%{cat | state: Sleep.new}, nil, Text.get_text(:fall_asleep, cat: cat, who: who)}
   end
 
-  def tire(_state, cat, who) do
-    {Cat.change_energy(cat, :dec), who, nil}
+  def tire(_state, cat, _who) do
+    {Cat.change_energy(cat, :dec), nil, nil}
+  end
+
+  def metabolic(_state, cat, _who) do
+    weight_dynamic = Cat.weight_dynamic(cat)
+    message = case weight_dynamic do
+      :inc -> cat.name <> " толстеет"
+      :dec -> cat.name <> " худеет"
+      :ok -> nil
+    end
+    new_cat = cat |> Cat.change_weight(weight_dynamic) |> Cat.change_satiety(:dec)
+    {new_cat, nil, message}
+  end
+
+  def hungry(_state, cat, feeder) do
+    {food, new_feeder} =
+      case :queue.out(feeder) do
+        {{_, food}, new_q} -> {food, new_q}
+        {:empty, new_q} -> {:empty, new_q}
+      end
+    case food do
+      :empty -> nil
+      food ->
+        [
+          {new_feeder, nil, Text.get_text(:feeder_consume, cat: cat, food: food)},
+          Cat.eat(cat, :feeder)
+        ]
+    end
   end
 
   defimpl CatState do
-
     defdelegate pet(state, cat, who), to: Awake
     defdelegate hug(state, cat, who), to: State
     defdelegate mew(state, cat, who), to: Awake
@@ -60,5 +86,8 @@ defmodule Katex.CatChat.Cat.State.Awake do
       do: {%{cat | state: Away.new}, who, Text.get_text(:going_out, cat: cat, who: who)}
     def pine(%Awake{}, cat, who),
       do: {%{cat | state: WantCare.new}, who, Text.get_text(:want_care, cat: cat, who: who)}
+    defdelegate metabolic(state, cat, who), to: Awake
+    defdelegate react_to_triggers(state, cat, who, triggers), to: State
+    defdelegate hungry(state, cat, feeder), to: Awake
   end
 end

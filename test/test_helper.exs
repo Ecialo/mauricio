@@ -1,6 +1,6 @@
 ExUnit.start()
 
-defmodule KatexTest.Helpers do
+defmodule MauricioTest.Helpers do
 
   import ExUnit.Assertions
 
@@ -9,7 +9,7 @@ defmodule KatexTest.Helpers do
   alias Nadia.Model.Chat, as: NadiaChat
   alias Nadia.Model.User, as: NadiaUser
 
-  alias Katex.CatChat.{Chat, Cat, Member}
+  alias Mauricio.CatChat.{Chat, Cat, Member}
 
   def start_update do
     update_with_text(1, "/start")
@@ -100,15 +100,16 @@ defmodule KatexTest.Helpers do
       |> body_to_dict()
   end
 
+  def weak_text_eq(text, :any) when is_binary(text), do: true
+  def weak_text_eq(text, expected_texts) when is_list(expected_texts),
+    do: Enum.any?(expected_texts, fn x -> x == text end)
+  def weak_text_eq(text, expected_text), do: text == expected_text
+
   def assert_capture_expected_text(expected_text) do
     request_text =
       body_of_captured_request()
       |> Map.fetch!("text")
-    case expected_text do
-      :any -> true
-      text ->
-        assert request_text == text
-    end
+    assert weak_text_eq(request_text, expected_text)
   end
 
   def assert_capture_photo_or_animation() do

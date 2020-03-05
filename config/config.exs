@@ -1,8 +1,8 @@
 import Config
 
-config :katex,
+config :mauricio,
   max_karma: 10,
-  default_name: "Юппи",
+  default_name: "Мяурицио",
   text: %{
     attracted: "Мурмурмур",
     banished: """
@@ -132,7 +132,7 @@ config :katex,
         """,
       ],
       vomit: """
-      <i>Котяра съел слишком много и его стошнило. В этом явно виноват <%= who.fname <> " " <> who.sname %></i>
+      <i>Котяра съел слишком много и его стошнило. В этом явно виноват <%= if not is_atom(who) do who.fname <> " " <> who.sname else "только он сам" end %></i>
       """
     },
     stop: "<i>Котяра выпрыгнул с балкона и убежал.</i>",
@@ -179,6 +179,9 @@ config :katex,
     ],
     sad: "Мямямяууууу...",
     cat_is_back: "<%= cat.name %> вернулся домой",
+    feeder_consume: """
+    <i><%= cat.name %> съедает из кормушки</i> <b><%= food %></b>
+    """
   },
   triggers: %{
     attract: ["кс", "кис"],

@@ -1,40 +1,41 @@
-defmodule KatexTest.CatTest do
+defmodule MauricioTest.CatTest do
   use ExUnit.Case
 
-  alias Katex.CatChat.Cat
-  alias Katex.CatChat.Member
+  alias Mauricio.Text
+  alias Mauricio.CatChat.Cat
+  alias Mauricio.CatChat.Member
+  alias Mauricio.CatChat.Cat.State.{Awake, Away, Sleep, WantCare}
+
+  alias MauricioTest.Helpers
 
   test "good awake pet" do
     member = Member.new("A", "B", 1, 1, True)
-    cat = Cat.new("C", :awake, 1, 1, 0)
+    cat = Cat.new("C", Awake.new, 1, 1, 0)
 
     expected_text = """
     <i>A B погладил котяру.</i>
     """
-
+    expected = Text.get_all_texts(:awake_pet, who: member, cat: cat)
     {cat, _member, text} = Cat.pet(cat, member)
 
-    assert text == expected_text
+    assert Helpers.weak_text_eq(text, expected)
     assert cat.times_pet == 1
   end
 
   test "bad awake pet" do
     member = Member.new("A", "B", 1, 1, True)
-    cat = Cat.new("C", :awake, 1, 1, 10000)
+    cat = Cat.new("C", Awake.new, 1, 1, 10000)
 
-    expected_text = """
-    <i>C недоволен и цапает A B за палец.</i>
-    ШШШШ.
-    """
+    expected_text = Text.get_all_texts(:bad_pet, who: member, cat: cat)
     {cat, _member, text} = Cat.pet(cat, member)
 
-    assert text == expected_text
+    assert Helpers.weak_text_eq(text, expected_text)
     assert cat.times_pet == 0
   end
 
   test "joyful pet" do
     member = Member.new("A", "B", 1, 1, True)
-    cat = Cat.new("C", {:want_care, 0}, 1, 1, 0)
+    cat = Cat.new("C", WantCare.new(), 1, 1, 0)
 
     expected_text = """
     <i>A B погладил котика</i>
@@ -43,7 +44,7 @@ defmodule KatexTest.CatTest do
 
     {cat, member, text} = Cat.pet(cat, member)
 
-    assert cat.state == :awake
+    assert cat.state == Awake.new
     assert cat.times_pet == 1
     assert member.karma == 2
     assert text == expected_text
@@ -51,7 +52,7 @@ defmodule KatexTest.CatTest do
 
   test "away pet" do
     member = Member.new("A", "B", 1, 1, True)
-    cat = Cat.new("C", :away, 1, 1, 0)
+    cat = Cat.new("C", Away.new, 1, 1, 0)
     {cat, _member, text} = Cat.pet(cat, member)
 
     expected_text = """

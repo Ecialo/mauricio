@@ -1,7 +1,7 @@
-defmodule Katex.Poller do
+defmodule Mauricio.Poller do
   use GenServer
   require Logger
-  alias Katex.CatChat
+  alias Mauricio.CatChat
 
   def start_link(_arg) do
     Logger.log(:info, "Started poller")
@@ -20,7 +20,6 @@ defmodule Katex.Poller do
   end
 
   def schedule_poll do
-    # Process.send_after(self(), :poll, 60 * 1000)
     Process.send_after(self(), :poll, 60 * 10)
   end
 
@@ -40,7 +39,7 @@ defmodule Katex.Poller do
 
   def process_message(%{update_id: update_id} = update) do
     Logger.log(:info, inspect(update))
-    CatChat.process_update(update)
+    CatChat.process_update(update, :async)
     update_id
   end
 

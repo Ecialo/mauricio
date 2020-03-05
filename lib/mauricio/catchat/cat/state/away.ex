@@ -1,9 +1,9 @@
-defmodule Katex.CatChat.Cat.State.Away do
+defmodule Mauricio.CatChat.Cat.State.Away do
   alias __MODULE__, as: Away
-  alias Katex.Text
-  alias Katex.CatChat.{Cat, Member}
-  alias Katex.CatChat.Cat.{State, CatState}
-  alias Katex.CatChat.Cat.State.Awake
+  alias Mauricio.Text
+  alias Mauricio.CatChat.{Cat, Member}
+  alias Mauricio.CatChat.Cat.{State, CatState}
+  alias Mauricio.CatChat.Cat.State.Awake
 
   defstruct []
 
@@ -21,5 +21,9 @@ defmodule Katex.CatChat.Cat.State.Away do
     def tire(%Away{}, _cat, _who), do: nil
     def pine(%Away{}, cat, who),
       do: {%{cat | state: Awake.new}, who, Text.get_text(:cat_is_back)}
+    defdelegate react_to_triggers(state, cat, who, triggers), to: State
+    def eat(%Away{}, _cat, _who), do: nil
+    def hungry(%Away{}, _cat, _feeder), do: nil
+    def metabolic(%Away{}, _cat, _who), do: nil
   end
 end

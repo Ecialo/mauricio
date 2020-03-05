@@ -1,9 +1,9 @@
-defmodule Katex.CatChat.Cat.State.WantCare do
+defmodule Mauricio.CatChat.Cat.State.WantCare do
   alias __MODULE__, as: WantCare
-  alias Katex.Text
-  alias Katex.CatChat.{Cat, Member}
-  alias Katex.CatChat.Cat.{State, CatState}
-  alias Katex.CatChat.Cat.State.Awake
+  alias Mauricio.Text
+  alias Mauricio.CatChat.{Cat, Member}
+  alias Mauricio.CatChat.Cat.{State, CatState}
+  alias Mauricio.CatChat.Cat.State.Awake
 
   @type t() :: %WantCare{times_not_pet: non_neg_integer}
 
@@ -11,6 +11,10 @@ defmodule Katex.CatChat.Cat.State.WantCare do
 
   def new do
     %WantCare{}
+  end
+
+  def new(times_not_pet) do
+    %WantCare{times_not_pet: times_not_pet}
   end
 
   defimpl CatState do
@@ -23,7 +27,10 @@ defmodule Katex.CatChat.Cat.State.WantCare do
     end
     defdelegate hug(state, cat, who), to: State
     defdelegate mew(state, cat, who), to: Awake
-    def lound_sound_reaction(%WantCare{}, _cat, _who), do: nil
+    defdelegate eat(state, cat, who), to: Awake
+    defdelegate hungry(state, cat, feeder), to: Awake
+    def loud_sound_reaction(%WantCare{}, _cat, _who), do: nil
+    defdelegate metabolic(state, cat, who), to: Awake
     defdelegate tire(state, cat, who), to: Awake
     def pine(%WantCare{times_not_pet: 3}, cat, who),
       do: {%{cat | state: Awake.new}, who, Text.get_text(:sad)}
@@ -32,6 +39,7 @@ defmodule Katex.CatChat.Cat.State.WantCare do
         %{cat | state: %{state | times_not_pet: times_not_pet + 1}},
         who, Text.get_text(:mew)
       }
+    defdelegate react_to_triggers(state, cat, who, triggers), to: State
   end
 
 end

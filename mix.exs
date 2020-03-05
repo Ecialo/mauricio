@@ -1,9 +1,9 @@
-defmodule Katex.MixProject do
+defmodule Mauricio.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :katex,
+      app: :mauricio,
       version: "0.1.0",
       elixir: "~> 1.9",
       start_permanent: Mix.env() == :prod,
@@ -16,7 +16,8 @@ defmodule Katex.MixProject do
     [
       applications: [:nadia],
       extra_applications: [:logger],
-      mod: {Katex, []}
+      mod: {Mauricio, []},
+      start_phases: [setup_webhook: []],
     ]
   end
 
@@ -25,8 +26,10 @@ defmodule Katex.MixProject do
     [
       {:nadia, "~> 0.6.0"},
       {:elli, "~> 3.0"},
+      {:jason, "~> 1.1"},
       {:bookish_spork, github: "tank-bohr/bookish_spork", only: :test},
-      {:dialyxir, "~> 1.0.0-rc.7", only: [:dev], runtime: false}
+      {:dialyxir, "~> 1.0.0-rc.7", only: :dev, runtime: false},
+      {:rename, "~> 0.1.0", only: :dev}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]
