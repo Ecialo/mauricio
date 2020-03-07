@@ -75,6 +75,7 @@ defmodule Mauricio.CatChat.Chat do
   end
 
   def handle_call(:stop, _from, state) do
+    # Logger.log(:info, "stop")
     {:stop, :normal, :ok, state}
   end
 

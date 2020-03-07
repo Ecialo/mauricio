@@ -21,20 +21,20 @@ defmodule Mauricio.CatChat.Cat.State.Awake do
 
   def mew(_state, cat, who) do
     message = case Member.karma_level(who) do
-      :bad_karma -> Text.get_text(:aggressive)
-      _ -> Text.get_text(:mew)
+      :bad_karma -> Text.get_text(:aggressive, cat: cat, who: who)
+      _ -> Text.get_text(:mew, cat: cat, who: who)
     end
-    {cat, who, message}
+    {cat, nil, message}
   end
 
   def eat(_state, cat, who) do
     case Cat.change_satiety(cat, :inc) do
       {:ok, new_cat} ->
-        {new_cat, who, Text.get_text([:satiety, cat.satiety], who: who, cat: cat)}
+        {new_cat, nil, Text.get_text([:satiety, cat.satiety], who: who, cat: cat)}
       {:vomit, new_cat} ->
         {
           new_cat,
-          Member.change_karma(who, :dec),
+          if is_struct(who) do Member.change_karma(who, :dec) end,
           Text.get_text([:satiety, :vomit], cat: cat, who: who)
         }
     end
@@ -55,7 +55,7 @@ defmodule Mauricio.CatChat.Cat.State.Awake do
       :dec -> cat.name <> " худеет"
       :ok -> nil
     end
-    new_cat = cat |> Cat.change_weight(weight_dynamic) |> Cat.change_satiety(:dec)
+    {:ok, new_cat} = cat |> Cat.change_weight(weight_dynamic) |> Cat.change_satiety(:dec)
     {new_cat, nil, message}
   end
 
@@ -70,7 +70,7 @@ defmodule Mauricio.CatChat.Cat.State.Awake do
       food ->
         [
           {new_feeder, nil, Text.get_text(:feeder_consume, cat: cat, food: food)},
-          Cat.eat(cat, :feeder)
+          Cat.eat(cat, :no_one)
         ]
     end
   end

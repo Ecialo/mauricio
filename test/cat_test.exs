@@ -8,31 +8,6 @@ defmodule MauricioTest.CatTest do
 
   alias MauricioTest.Helpers
 
-  test "good awake pet" do
-    member = Member.new("A", "B", 1, 1, True)
-    cat = Cat.new("C", Awake.new, 1, 1, 0)
-
-    expected_text = """
-    <i>A B погладил котяру.</i>
-    """
-    expected = Text.get_all_texts(:awake_pet, who: member, cat: cat)
-    {cat, _member, text} = Cat.pet(cat, member)
-
-    assert Helpers.weak_text_eq(text, expected)
-    assert cat.times_pet == 1
-  end
-
-  test "bad awake pet" do
-    member = Member.new("A", "B", 1, 1, True)
-    cat = Cat.new("C", Awake.new, 1, 1, 10000)
-
-    expected_text = Text.get_all_texts(:bad_pet, who: member, cat: cat)
-    {cat, _member, text} = Cat.pet(cat, member)
-
-    assert Helpers.weak_text_eq(text, expected_text)
-    assert cat.times_pet == 0
-  end
-
   test "joyful pet" do
     member = Member.new("A", "B", 1, 1, True)
     cat = Cat.new("C", WantCare.new(), 1, 1, 0)

@@ -1,7 +1,6 @@
 defmodule Mauricio.CatChat.Cat do
 
   alias __MODULE__, as: Cat
-  alias Mauricio.CatChat.Member
   alias Mauricio.CatChat.Cat.CatState
   alias Mauricio.CatChat.Cat.State.Awake
   alias Mauricio.Text
@@ -36,7 +35,7 @@ defmodule Mauricio.CatChat.Cat do
     do: {%{cat | laziness: round(l / 2)}, who, Text.get_text(:become_annoying)}
 
   def change_satiety(cat = %Cat{satiety: satiety, weight: weight}, :inc) do
-    if satiety < 10 do
+    if satiety <= 10 do
       {:ok, %{cat | satiety: satiety + 1}}
     else
       {:vomit, %{cat | satiety: 5, weight: round(weight * 0.9)}}
@@ -44,14 +43,14 @@ defmodule Mauricio.CatChat.Cat do
   end
 
   def change_satiety(cat = %Cat{satiety: satiety}, :dec) do
-    {:ok, %{cat | satiety: satiety - 1}}
+    {:ok, %{cat | satiety: max(satiety - 1, 0)}}
   end
 
   def weight_dynamic(%Cat{satiety: satiety}) do
-    case satiety do
-      10 -> :inc
-      0 -> :dec
-      _ -> :ok
+    cond do
+      satiety > 8 -> :inc
+      satiety < 3 -> :dec
+      true -> :ok
     end
   end
 

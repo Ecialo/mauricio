@@ -28,6 +28,7 @@ defmodule Mauricio.MixProject do
       {:elli, "~> 3.0"},
       {:jason, "~> 1.1"},
       {:bookish_spork, github: "tank-bohr/bookish_spork", only: :test},
+      {:ex_parameterized, "~> 1.3.7", only: :test},
       {:dialyxir, "~> 1.0.0-rc.7", only: :dev, runtime: false},
       {:rename, "~> 0.1.0", only: :dev}
       # {:dep_from_hexpm, "~> 0.3.0"},
