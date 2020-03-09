@@ -13,15 +13,10 @@ defmodule Mauricio.CatChat.Cat.State.Sleep do
 
   defimpl CatState do
     def pet(%Sleep{}, cat, who),
-      do: {cat, who, Text.get_text(:sleep_pet, who: who)}
+      do: {cat, nil, Text.get_text(:sleep_pet, cat: cat, who: who)}
     defdelegate hug(state, cat, who), to: State
     def mew(%Sleep{}, cat, who),
-      do: {cat, who, Text.get_text(:sleep)}
-    @spec loud_sound_reaction(
-            Mauricio.CatChat.Cat.State.Sleep.t(),
-            %{state: any},
-            Mauricio.CatChat.Member.t()
-          ) :: {%{state: Mauricio.CatChat.Cat.State.Awake.t()}, Mauricio.CatChat.Member.t(), any}
+      do: {cat, nil, Text.get_text(:sleep, cat: cat, who: who)}
     def loud_sound_reaction(%Sleep{}, cat, who),
       do: {%{cat | state: Awake.new}, Member.change_karma(who, :dec), Text.get_text(:aggressive)}
     def tire(
@@ -29,9 +24,9 @@ defmodule Mauricio.CatChat.Cat.State.Sleep do
       %Cat{energy: energy, weight: weight} = cat,
       who
     ) when energy >= weight,
-      do: {%{cat | state: Awake.new}, who, Text.get_text(:wake_up)}
+      do: {%{cat | state: Awake.new}, nil, Text.get_text(:wake_up, who: who, cat: cat)}
     def tire(%Sleep{}, cat, who),
-      do: {Cat.change_energy(cat, :inc), who, Text.get_text(:sleep)}
+      do: {Cat.change_energy(cat, :inc), nil, Text.get_text(:sleep, who: who, cat: cat)}
     def pine(%Sleep{}, _cat, _who), do: nil
     def eat(%Sleep{}, _cat, _who), do: nil
     def hungry(%Sleep{}, _cat, _who), do: nil

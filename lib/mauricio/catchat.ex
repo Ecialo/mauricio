@@ -65,12 +65,14 @@ defmodule Mauricio.CatChat do
   require Logger
 
   alias Mauricio.CatChat.Supervisor, as: CatSup
+  alias Mauricio.Text
   alias Nadia.Model.Update, as: NadiaUpdate
   alias Nadia.Model.Message, as: NadiaMessage
   alias Nadia.Model.Chat, as: NadiaChat
 
   @start_command "/start"
   @stop_command "/stop"
+  @help_command "/help"
 
   def start_link(_arg) do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
@@ -93,6 +95,8 @@ defmodule Mauricio.CatChat do
         Logger.log(:info, "Start chat #{chat_id} by command #{text}")
         CatSup.start_chat(chat_id)
         :ok
+      {_, @help_command<>_rest} ->
+        Nadia.send_message(chat_id, Text.get_text(:help))
       {chat_pid, @stop_command<>_rest} when not is_nil(chat_pid) ->
         Logger.log(:info, "Stop chat #{chat_id} with pid #{inspect(chat_pid)} by command #{text}")
         CatSup.stop_chat(chat_pid)
@@ -128,5 +132,5 @@ defmodule Mauricio.CatChat do
         GenServer.call(chat_pid, {:process_message, message})
     end
   end
-  
+
 end

@@ -1,4 +1,4 @@
-defmodule MauricioTest.Cat.State.Awake do
+defmodule MauricioTest.Cat.State.Away do
   use ExUnit.Case
 
   alias Mauricio.CatChat.{Cat, Member}

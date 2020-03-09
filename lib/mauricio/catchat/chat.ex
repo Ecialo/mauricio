@@ -79,8 +79,10 @@ defmodule Mauricio.CatChat.Chat do
     {:stop, :normal, :ok, state}
   end
 
-  def terminate(:normal, %{chat_id: chat_id}),
-    do: Storage.pop(chat_id)
+  def terminate(:normal, %{chat_id: chat_id}) do
+    Storage.pop(chat_id)
+    send_message(chat_id, Text.get_text(:stop))
+  end
   def terminate(:normal, _state), do: nil
 
   @spec process_message(NadiaMessage.t, Chat.state) :: Chat.state
@@ -125,24 +127,32 @@ defmodule Mauricio.CatChat.Chat do
   def handle_info(:tire, %{cat: cat, members: members} = state) do
     {_, who} = Enum.random(members)
     state = Cat.tire(cat, who) |> Responses.process_responses(state)
+    schedule(state, :tire)
     {:noreply, state}
   end
 
   def handle_info(:pine, %{cat: cat, members: members} = state) do
-    who = members |> get_active_members() |> Enum.random()
+    {_, who} = Enum.random(members)
     state = Cat.pine(cat, who) |> Responses.process_responses(state)
+    schedule(state, :pine)
     {:noreply, state}
   end
 
   def handle_info(:metabolic, %{cat: cat, members: members} = state) do
     {_, who} = Enum.random(members)
     state = cat |> Cat.metabolic(who) |> Responses.process_responses(state)
-    {:norely, state}
+    if state.cat.weight >= 2 do
+      schedule(state, :metabolic)
+      {:noreply, state}
+    else
+      {:stop, :normal, state}
+    end
   end
 
   def handle_info(:hungry, %{cat: cat, feeder: feeder} = state) do
     state = cat |> Cat.hungry(feeder) |> Responses.process_responses(state)
-    {:norely, state}
+    schedule(state, :hungry)
+    {:noreply, state}
   end
 
   # Helpers
@@ -152,9 +162,7 @@ defmodule Mauricio.CatChat.Chat do
       p
     end
 
-    members
-    |> Enum.filter(satisfy?)
-    |> elem(1)
+    Enum.filter(members, satisfy?)
   end
 
   def child_spec(chat_id) do
@@ -165,7 +173,6 @@ defmodule Mauricio.CatChat.Chat do
     }
   end
 
-  @spec new_state(chat_id, NadiaMessage.t, String.t) :: state
   def new_state(chat_id, %NadiaMessage{from: user}, cat_name) do
     cat = Cat.new(cat_name)
 

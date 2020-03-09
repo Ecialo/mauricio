@@ -55,7 +55,7 @@ defmodule Mauricio.CatChat.Cat do
   end
 
   def change_energy(%Cat{energy: energy, weight: weight} = cat, :inc) do
-    %{cat | energy: min(weight, round(energy + weight * 0.35))}
+    %{cat | energy: min(weight, round(energy + 1 + weight * 0.35))}
   end
 
   def change_energy(%Cat{energy: 0} = cat, :dec), do: cat
