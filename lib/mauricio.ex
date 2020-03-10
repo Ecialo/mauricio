@@ -23,9 +23,10 @@ defmodule Mauricio do
       Application.get_env(:mauricio, :update_provider),
       Application.get_env(:mauricio, :url)
     } do
-      {:acceptor, url} when not is_nil(url) -> Nadia.set_webhook(url: url)
+      {:acceptor, url} when not is_nil(url) ->
+        Mauricio.Acceptor.set_webhook(url)
       {:poller, _} -> Nadia.delete_webhook()
-      _anything_else -> :ok 
+      _anything_else -> :ok
     end
   end
 

@@ -2,7 +2,7 @@ defmodule Mauricio.CatChat.Chat.Interaction do
   alias Nadia.Model.Message, as: NadiaMessage
   alias Nadia.Model.User, as: NadiaUser
 
-  alias Mauricio.CatChat.{Member, Cat, Chat}
+  alias Mauricio.CatChat.{Member, Cat}
   alias Mauricio.Text
 
   @hug_command "/hug"

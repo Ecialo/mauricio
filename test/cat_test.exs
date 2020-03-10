@@ -1,12 +1,9 @@
 defmodule MauricioTest.CatTest do
   use ExUnit.Case
 
-  alias Mauricio.Text
   alias Mauricio.CatChat.Cat
   alias Mauricio.CatChat.Member
-  alias Mauricio.CatChat.Cat.State.{Awake, Away, Sleep, WantCare}
-
-  alias MauricioTest.Helpers
+  alias Mauricio.CatChat.Cat.State.{Awake, Away, WantCare}
 
   test "joyful pet" do
     member = Member.new("A", "B", 1, 1, True)
@@ -36,9 +33,5 @@ defmodule MauricioTest.CatTest do
     assert text == expected_text
     assert cat.times_pet == 0
   end
-
-  # test "hug dynamic" do
-
-  # end
 
 end

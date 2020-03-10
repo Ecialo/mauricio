@@ -18,7 +18,7 @@ defmodule Mauricio.CatChat.Cat.State.Sleep do
     def mew(%Sleep{}, cat, who),
       do: {cat, nil, Text.get_text(:sleep, cat: cat, who: who)}
     def loud_sound_reaction(%Sleep{}, cat, who),
-      do: {%{cat | state: Awake.new}, Member.change_karma(who, :dec), Text.get_text(:aggressive)}
+      do: {%{cat | state: Awake.new}, Member.change_karma(who, :dec), Text.get_text(:aggressive, cat: cat, who: who)}
     def tire(
       %Sleep{},
       %Cat{energy: energy, weight: weight} = cat,

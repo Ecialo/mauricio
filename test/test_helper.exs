@@ -9,7 +9,7 @@ defmodule MauricioTest.Helpers do
   alias Nadia.Model.Chat, as: NadiaChat
   alias Nadia.Model.User, as: NadiaUser
 
-  alias Mauricio.CatChat.{Chat, Cat, Member}
+  alias Mauricio.CatChat.Chat
 
   def start_update do
     update_with_text(1, "/start")
@@ -89,15 +89,11 @@ defmodule MauricioTest.Helpers do
     }
   end
 
-  def body_to_dict(body) do
-    URI.query_decoder(body) |> Map.new()
-  end
-
   def body_of_captured_request() do
     :bookish_spork.capture_request()
       |> elem(1)
       |> Map.fetch!(:body)
-      |> body_to_dict()
+      |> URI.decode_query()
   end
 
   def weak_text_eq(text, :any) when is_binary(text), do: true

@@ -23,7 +23,7 @@ defmodule MauricioTest.Cat.State.Away do
     cat = Cat.new("C", Away.new, 1, 1, 0)
 
     expected = Text.get_all_texts(:hug_away, who: member, cat: cat)
-    {cat, _member, text} = Cat.hug(cat, member)
+    {_cat, _member, text} = Cat.hug(cat, member)
 
     assert Helpers.weak_text_eq(text, expected)
   end

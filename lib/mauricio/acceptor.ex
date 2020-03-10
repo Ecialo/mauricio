@@ -44,4 +44,8 @@ defmodule Mauricio.Acceptor do
   def tg_token do
     @tg_token
   end
+
+  def set_webhook(host) do
+    Nadia.set_webhook(url: "#{host}/#{@tg_token}")
+  end
 end

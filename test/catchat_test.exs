@@ -35,7 +35,7 @@ defmodule MauricioTest.CatChat.ResponseProcessing do
   use ExUnit.Case
 
   alias Mauricio.Text
-  alias Mauricio.CatChat.{Cat, Member, Chat}
+  alias Mauricio.CatChat.{Cat, Chat}
   alias Mauricio.CatChat.Chat.Responses
   alias MauricioTest.Helpers
 
@@ -76,11 +76,10 @@ defmodule MauricioTest.CatChat.ResponseProcessing do
 
   test "process response from command" do
     state = Chat.new_state(1, Helpers.message_with_text(1, "1"), "Cat")
-    who = state[:members][1]
     %Cat{
       times_pet: times_pet,
       laziness: laziness
-    } = cat = state[:cat]
+    } = state[:cat]
 
 
     message = fn text -> Helpers.message_with_text(1, text) end

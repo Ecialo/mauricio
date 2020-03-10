@@ -1,8 +1,7 @@
 defmodule MauricioTest.Chat do
   use ExUnit.Case
 
-  alias Mauricio.CatChat
-  alias Mauricio.CatChat.{Chat, Chats, Cat}
+  alias Mauricio.CatChat.{Chat, Cat}
   alias Mauricio.CatChat.Cat.State.{Sleep, WantCare}
   alias MauricioTest.Helpers
   alias Mauricio.Text
