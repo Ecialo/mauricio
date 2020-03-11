@@ -13,13 +13,13 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Create config/secret.exs
+      run: touch ${GITHUB_WORKSPACE}/config/secret.exs
     - name: Setup elixir
       uses: actions/setup-elixir@v1
       with:
         elixir-version: 1.9.4 # Define the elixir version [required]
         otp-version: 22.2 # Define the OTP version [required]
-    - name: Echo the greeting's time
-      run: touch ${GITHUB_WORKSPACE}/config/secret.exs
     - name: Install Dependencies
       run: mix deps.get
     - name: Run Tests
