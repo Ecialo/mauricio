@@ -18,7 +18,7 @@ jobs:
         echo "import Config
         
         config :nadia,
-          token: \"xxx\",
+          token: \"xxx\"
         
         config :mauricio,
           cat_api_token: \"xxx\",
