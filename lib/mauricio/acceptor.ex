@@ -1,4 +1,5 @@
 defmodule Mauricio.Acceptor do
+  require Logger
   alias Mauricio.CatChat
   @behaviour :elli_handler
 
@@ -54,7 +55,9 @@ defmodule Mauricio.Acceptor do
   def set_webhook(url) do
     host = url[:host]
     port = url[:port]
+    hook = "#{host}:#{port}/#{@tg_token}"
+    Logger.info("Hook url #{hook}")
     Nadia.delete_webhook()
-    Nadia.set_webhook(url: "#{host}:#{port}/#{@tg_token}")
+    Nadia.set_webhook(url: hook)
   end
 end
