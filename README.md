@@ -1,4 +1,4 @@
-![](https://github.com/Preveter/mauricio/workflows/main/badge.svg)
+![main](https://github.com/Ecialo/mauricio/workflows/main/badge.svg)
 
 # Mauricio
 Наглый котик в телеграме. Реинкарнация старого [кота](https://github.com/Ecialo/kotbot), которого стало слишком больно поддерживать.
