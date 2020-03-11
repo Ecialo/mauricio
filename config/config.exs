@@ -203,4 +203,6 @@ config :mauricio,
   }
 
 import_config "#{Mix.env}.exs"
-import_config "secret.exs"
+if Mix.env != :prod do
+  import_config "secret.exs"
+end

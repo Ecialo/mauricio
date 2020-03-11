@@ -1,5 +1,4 @@
 defmodule Mauricio.Acceptor do
-  # require Logger
   alias Mauricio.CatChat
   @behaviour :elli_handler
 
@@ -41,11 +40,20 @@ defmodule Mauricio.Acceptor do
     )
   end
 
+  def child_spec(args) do
+    %{
+      id: __MODULE__,
+      start: {Mauricio.Acceptor, :start_link, [args]}
+    }
+  end
+
   def tg_token do
     @tg_token
   end
 
-  def set_webhook(host) do
-    Nadia.set_webhook(url: "#{host}/#{@tg_token}")
+  def set_webhook(url) do
+    host = url[:host]
+    port = url[:port]
+    Nadia.set_webhook(url: "#{host}:#{port}/#{@tg_token}")
   end
 end

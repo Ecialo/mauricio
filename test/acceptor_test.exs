@@ -5,7 +5,8 @@ defmodule MauricioTest.Acceptor do
   alias Mauricio.CatChat.Chats
 
   setup_all do
-    assert {:ok, _server_pid} = Mauricio.Acceptor.start_link(port: 4001)
+    children = [{Mauricio.Acceptor, [port: 4001]}]
+    assert {:ok, _server_pid} = Supervisor.start_link(children, strategy: :one_for_one)
     :ok
   end
 
@@ -50,7 +51,7 @@ defmodule MauricioTest.Acceptor do
   end
 
   test "set webhook" do
-    Acceptor.set_webhook("localhost:4001")
+    Acceptor.set_webhook([host: "localhost", port: 4001])
     {:ok, request} = :bookish_spork.capture_request()
     url =
       request
