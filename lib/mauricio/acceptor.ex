@@ -54,6 +54,7 @@ defmodule Mauricio.Acceptor do
   def set_webhook(url) do
     host = url[:host]
     port = url[:port]
+    Nadia.delete_webhook()
     Nadia.set_webhook(url: "#{host}:#{port}/#{@tg_token}")
   end
 end
