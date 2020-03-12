@@ -97,6 +97,7 @@ defmodule Mauricio.CatChat do
         :ok
       {_, @help_command<>_rest} ->
         Nadia.send_message(chat_id, Text.get_text(:help))
+        :ok
       {chat_pid, @stop_command<>_rest} when not is_nil(chat_pid) ->
         Logger.log(:info, "Stop chat #{chat_id} with pid #{inspect(chat_pid)} by command #{text}")
         CatSup.stop_chat(chat_pid)
