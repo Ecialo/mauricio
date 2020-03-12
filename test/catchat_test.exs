@@ -15,16 +15,16 @@ defmodule MauricioTest.CatChat do
   end
 
   test "create new chat then shutdown then again" do
-    {:noreply, nil} = CatChat.handle_cast({:process_update, Helpers.start_update}, nil)
+    :ok = CatChat.process_update(Helpers.start_update)
     assert DynamicSupervisor.count_children(Chats) == %{active: 1, specs: 1, supervisors: 0, workers: 1}
 
-    {:noreply, nil} = CatChat.handle_cast({:process_update, Helpers.stop_update}, nil)
+    :ok = CatChat.process_update(Helpers.stop_update)
     assert DynamicSupervisor.count_children(Chats) == %{active: 0, specs: 0, supervisors: 0, workers: 0}
 
-    {:noreply, nil} = CatChat.handle_cast({:process_update, Helpers.start_update}, nil)
+    :ok = CatChat.process_update(Helpers.start_update)
     assert DynamicSupervisor.count_children(Chats) == %{active: 1, specs: 1, supervisors: 0, workers: 1}
 
-    {:noreply, nil} = CatChat.handle_cast({:process_update, Helpers.stop_update}, nil)
+    :ok = CatChat.process_update(Helpers.stop_update)
     assert DynamicSupervisor.count_children(Chats) == %{active: 0, specs: 0, supervisors: 0, workers: 0}
   end
 

@@ -45,6 +45,12 @@ defmodule MauricioTest.Acceptor do
     assert resp.status_code == 200
     assert DynamicSupervisor.count_children(Chats) == %{active: 1, specs: 1, supervisors: 0, workers: 1}
 
+    assert {:ok, resp} = HTTPoison.post(
+      url,
+      File.read!("./test/test_data/hello_update.json"),
+      [{"content-type", "application/json"}]
+    )
+
     assert {:ok, resp} = stop_req(url)
     assert resp.status_code == 200
     assert DynamicSupervisor.count_children(Chats) == %{active: 0, specs: 0, supervisors: 0, workers: 0}
@@ -52,6 +58,7 @@ defmodule MauricioTest.Acceptor do
 
   test "set webhook" do
     Acceptor.set_webhook([host: "localhost", port: 4001])
+    {:ok, request} = :bookish_spork.capture_request()
     {:ok, request} = :bookish_spork.capture_request()
     url =
       request

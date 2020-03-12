@@ -78,25 +78,47 @@ defmodule Mauricio.CatChat.Chat do
     {:stop, :normal, :ok, state}
   end
 
+  def handle_call({:process_message, message}, _from, state) do
+    Logger.log(:info, "Handle regular")
+    new_state = process_message(message, state)
+    {:reply, :ok, new_state}
+  end
+
   def terminate(:normal, %{chat_id: chat_id}) do
     Storage.pop(chat_id)
     send_message(chat_id, Text.get_text(:stop))
   end
   def terminate(:normal, _state), do: nil
 
-  @spec process_message(NadiaMessage.t, Chat.state) :: Chat.state
-  def process_message(message, state) do
-    responses = Interaction.process_message(message, state)
-    Responses.process_responses(responses, state)
-  end
-
-  def handle_cast({:process_message, message}, state) when is_map(state) do
+  def handle_cast({:process_message, message}, state) do
     Logger.log(:info, "Handle regular")
     new_state = process_message(message, state)
     {:noreply, new_state}
   end
 
-  def handle_cast({:process_message, %NadiaMessage{text: text} = message}, chat_id) do
+  # def handle_cast({:process_message, %NadiaMessage{text: text} = message}, chat_id) do
+  #   default_name = Application.get_env(:mauricio, :default_name)
+  #   {name, key} = case text do
+  #     nil -> {default_name, :noname_cat}
+  #     "" -> {default_name, :noname_cat}
+  #     name -> {name, :name_cat}
+  #   end
+  #   name = String.capitalize(name)
+  #   state = new_state(chat_id, message, name)
+
+  #   send_message(chat_id, Text.get_text(key, cat: state.cat))
+
+  #   schedule(state, [:tire, :pine, :metabolic, :hungry])
+
+  #   {:noreply, state}
+  # end
+
+  @spec process_message(NadiaMessage.t, Chat.state) :: Chat.state
+  def process_message(message, state) when is_map(state) do
+    responses = Interaction.process_message(message, state)
+    Responses.process_responses(responses, state)
+  end
+  def process_message(%NadiaMessage{text: text} = message, chat_id) do
     default_name = Application.get_env(:mauricio, :default_name)
     {name, key} = case text do
       nil -> {default_name, :noname_cat}
@@ -107,12 +129,10 @@ defmodule Mauricio.CatChat.Chat do
     state = new_state(chat_id, message, name)
 
     send_message(chat_id, Text.get_text(key, cat: state.cat))
-
     schedule(state, [:tire, :pine, :metabolic, :hungry])
 
-    {:noreply, state}
+    state
   end
-
   def schedule(_state, []) do end
   def schedule(state, [event | rest]) do
     schedule(state, event)
