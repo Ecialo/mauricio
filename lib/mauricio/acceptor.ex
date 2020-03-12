@@ -59,7 +59,7 @@ defmodule Mauricio.Acceptor do
     port = url[:port]
     hook = "#{host}:#{port}/#{@tg_token}"
     Logger.info("Hook url #{hook}")
-    Nadia.delete_webhook() |> IO.inspect()
-    Nadia.set_webhook(url: hook) |> IO.inspect()
+    Nadia.delete_webhook()
+    Nadia.set_webhook(url: hook)
   end
 end
