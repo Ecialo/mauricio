@@ -1,4 +1,6 @@
 defmodule Mauricio.CatChat.Chat.Interaction do
+  require Logger
+
   alias Nadia.Model.Message, as: NadiaMessage
   alias Nadia.Model.User, as: NadiaUser
 
@@ -15,18 +17,29 @@ defmodule Mauricio.CatChat.Chat.Interaction do
     %NadiaMessage{text: text, from: %NadiaUser{id: user_id} = nadia_user} = message,
     %{members: members} = state
   ) when not is_nil(text) do
+    Logger.info("Message from user_id #{user_id} with text #{text}")
 
-    chat_member = case Map.get(members, user_id) do
-      nil -> Member.new(nadia_user)
-      member -> member
+    {chat_member, new_member?} = case Map.get(members, user_id) do
+      nil -> {Member.new(nadia_user), true}
+      member -> {member, false}
     end
 
     update_by_command = handle_command(String.downcase(text), chat_member, state)
-    case update_by_command do
+    update = case update_by_command do
       nil ->
         triggers = Text.find_triggers(text)
         handle_regular_message(message, triggers, chat_member, state)
       update -> update
+    end
+
+    if new_member? do
+      case update do
+        nil -> {nil, chat_member, nil}
+        {su, nil, m} -> {su, chat_member, m}
+        update -> update
+      end
+    else
+      update
     end
   end
 

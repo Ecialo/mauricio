@@ -86,8 +86,11 @@ defmodule Mauricio.CatChat.Cat.State do
 
   def react_to_triggers(_state, cat, who, triggers) do
     collect = fn tr, {cat, who, msgs} ->
-      {cat, who, msg} = react_to_trigger(tr, cat, who)
-      {cat, who, [msg | msgs]}
+      case react_to_trigger(tr, cat, who) do
+        nil -> {cat, who, msgs}
+        {cat, nil, msg} -> {cat, who, [msg | msgs]}
+        {cat, who, msg} -> {cat, who, [msg | msgs]}
+      end
     end
 
     {cat, who, msgs} =

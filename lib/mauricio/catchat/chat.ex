@@ -66,7 +66,9 @@ defmodule Mauricio.CatChat.Chat do
   def handle_continue(:start, chat_id) do
     Logger.log(:info, "Continue Start for #{chat_id}")
     case Storage.fetch(chat_id) do
-      {:ok, chat} -> {:noreply, chat}
+      {:ok, chat} ->
+        schedule(chat, :all)
+        {:noreply, chat}
       :error ->
         send_message(chat_id, Text.get_text(:start))
         {:noreply, chat_id}
@@ -113,12 +115,15 @@ defmodule Mauricio.CatChat.Chat do
     state = new_state(chat_id, message, name)
 
     send_message(chat_id, Text.get_text(key, cat: state.cat))
-    schedule(state, [:tire, :pine, :metabolic, :hungry])
+    schedule(state, :all)
 
     Storage.put_async(state)
 
     state
   end
+
+  def schedule(state, :all),
+    do: schedule(state, [:tire, :pine, :metabolic, :hungry])
   def schedule(_state, []) do end
   def schedule(state, [event | rest]) do
     schedule(state, event)

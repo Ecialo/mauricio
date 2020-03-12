@@ -19,19 +19,21 @@ defmodule MauricioTest.Helpers do
     update_with_text(1, "/stop")
   end
 
-  def update_with_text(chat_id, text) do
+  def update_with_text(chat_id, user_id \\ nil, text) do
+    user_id = user_id || chat_id
     %NadiaUpdate{
       callback_query: nil,
       channel_post: nil,
       chosen_inline_result: nil,
       edited_message: nil,
       inline_query: nil,
-      message: message_with_text(chat_id, text),
+      message: message_with_text(chat_id, user_id, text),
       update_id: 555290602
     }
   end
 
-  def message_with_text(chat_id, text) do
+  def message_with_text(chat_id, user_id \\ nil, text) do
+    user_id = user_id || chat_id
     %NadiaMessage{
       audio: nil,
       caption: nil,
@@ -46,7 +48,7 @@ defmodule MauricioTest.Helpers do
       forward_date: nil,
       forward_from: nil,
       forward_from_chat: nil,
-      from: user(chat_id),
+      from: user(user_id),
       group_chat_created: nil,
       left_chat_member: nil,
       location: nil,
@@ -80,12 +82,12 @@ defmodule MauricioTest.Helpers do
     }
   end
 
-  def user(chat_id) do
+  def user(user_id) do
     %NadiaUser{
-      first_name: "Yaropolk",
-      id: chat_id,
-      last_name: "",
-      username: "Zloe_Aloe",
+      first_name: "Yaropolk_#{user_id}",
+      id: user_id,
+      last_name: "#{user_id}",
+      username: "Zloe_Aloe_#{user_id}",
     }
   end
 
