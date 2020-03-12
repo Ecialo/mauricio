@@ -101,3 +101,26 @@ defmodule MauricioTest.CatChat.ResponseProcessing do
   end
 
 end
+
+defmodule MauricioTest.CatChat.Interaction do
+  use ExUnit.Case
+
+  alias Mauricio.Text
+  alias Mauricio.CatChat.{Cat, Chat, Member}
+  alias Mauricio.CatChat.Chat.Interaction
+  alias MauricioTest.Helpers
+
+  test "add to feeder" do
+    member = Member.new("A", "B", 1, 1, true)
+    s = %{cat: Cat.new("C"), feeder: :queue.new()}
+    {f, nil, m} = Interaction.handle_command("/add_to_feeder", member, s)
+    assert {:value, "ничего"} == :queue.peek(f)
+    {f, nil, m} = Interaction.handle_command("/add_to_feeder еда", member, s)
+    assert {:value, "еда"} == :queue.peek(f)
+    {f, nil, m} = Interaction.handle_command("/add_to_feeder ", member, s)
+    assert {:value, "ничего"} == :queue.peek(f)
+    {f, nil, m} = Interaction.handle_command("/add_to_feederеда", member, s)
+    assert {:value, "еда"} == :queue.peek(f)
+  end
+
+end

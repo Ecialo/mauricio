@@ -74,7 +74,6 @@ defmodule Mauricio.CatChat.Chat do
   end
 
   def handle_call(:stop, _from, state) do
-    # Logger.log(:info, "stop")
     {:stop, :normal, :ok, state}
   end
 
@@ -96,27 +95,12 @@ defmodule Mauricio.CatChat.Chat do
     {:noreply, new_state}
   end
 
-  # def handle_cast({:process_message, %NadiaMessage{text: text} = message}, chat_id) do
-  #   default_name = Application.get_env(:mauricio, :default_name)
-  #   {name, key} = case text do
-  #     nil -> {default_name, :noname_cat}
-  #     "" -> {default_name, :noname_cat}
-  #     name -> {name, :name_cat}
-  #   end
-  #   name = String.capitalize(name)
-  #   state = new_state(chat_id, message, name)
-
-  #   send_message(chat_id, Text.get_text(key, cat: state.cat))
-
-  #   schedule(state, [:tire, :pine, :metabolic, :hungry])
-
-  #   {:noreply, state}
-  # end
-
   @spec process_message(NadiaMessage.t, Chat.state) :: Chat.state
   def process_message(message, state) when is_map(state) do
     responses = Interaction.process_message(message, state)
-    Responses.process_responses(responses, state)
+    new_state = Responses.process_responses(responses, state)
+    Storage.put_async(new_state)
+    new_state
   end
   def process_message(%NadiaMessage{text: text} = message, chat_id) do
     default_name = Application.get_env(:mauricio, :default_name)
@@ -130,6 +114,8 @@ defmodule Mauricio.CatChat.Chat do
 
     send_message(chat_id, Text.get_text(key, cat: state.cat))
     schedule(state, [:tire, :pine, :metabolic, :hungry])
+
+    Storage.put_async(state)
 
     state
   end

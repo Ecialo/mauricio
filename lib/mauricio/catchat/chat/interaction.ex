@@ -39,9 +39,9 @@ defmodule Mauricio.CatChat.Chat.Interaction do
       overflow_message = Text.get_text(:feeder_overflow, old_food: old_food)
       result_message = Enum.join([new_food_message, "", overflow_message], "\n")
 
-      {feeder, who, result_message}
+      {feeder, nil, result_message}
     else
-      {feeder, who, new_food_message}
+      {feeder, nil, new_food_message}
     end
   end
 
@@ -54,7 +54,12 @@ defmodule Mauricio.CatChat.Chat.Interaction do
     }) do
     case text do
       @add_to_feeder_command<>rest ->
-        [_, food] = String.split(rest, " ", parts: 2)
+        food = case String.split(rest, " ", parts: 2) do
+          [""] -> "ничего"
+          [_, ""] -> "ничего"
+          [food] -> food
+          [_, food] -> food
+        end
         add_to_feeder(feeder, food, who)
       @hug_command<>_rest -> Cat.hug(cat, who)
       @pet_command<>_rest -> Cat.pet(cat, who)
