@@ -26,6 +26,7 @@ defmodule Mauricio do
     } do
       {:acceptor, url} when not is_nil(url) ->
         Mauricio.Acceptor.set_webhook(url)
+        :ok
       {:poller, _} -> Nadia.delete_webhook()
       _anything_else -> :ok
     end

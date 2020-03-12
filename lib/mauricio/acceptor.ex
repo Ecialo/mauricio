@@ -34,6 +34,8 @@ defmodule Mauricio.Acceptor do
   def handle_event(_event, _args, _config), do: :ok
 
   def start_link(args) do
+    Logger.info("Start Acceptor")
+    IO.inspect(args)
     :elli.start_link(
       port: args[:port],
       callback: __MODULE__,
@@ -57,7 +59,7 @@ defmodule Mauricio.Acceptor do
     port = url[:port]
     hook = "#{host}:#{port}/#{@tg_token}"
     Logger.info("Hook url #{hook}")
-    Nadia.delete_webhook()
-    Nadia.set_webhook(url: hook)
+    Nadia.delete_webhook() |> IO.inspect()
+    Nadia.set_webhook(url: hook) |> IO.inspect()
   end
 end
