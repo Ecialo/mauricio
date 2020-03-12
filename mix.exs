@@ -15,7 +15,7 @@ defmodule Mauricio.MixProject do
   def application do
     [
       applications: [:nadia],
-      extra_applications: [:logger, :elli, :jason],
+      extra_applications: [:logger, :elli, :jason, :eex],
       mod: {Mauricio, []},
       start_phases: [setup_webhook: []],
     ]
