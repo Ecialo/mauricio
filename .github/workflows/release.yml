@@ -1,9 +1,6 @@
 name: main
 
 on:
-  push:
-    tags:
-    - '*'
   release:
     types:
     - created
