@@ -1,4 +1,4 @@
-name: main
+name: dev
 
 on:
   push:
@@ -34,7 +34,7 @@ jobs:
     - name: Run Tests
       run: mix test
 
-  deploy:
+  deploy_dev:
     needs: test
     if: github.ref == 'refs/heads/master'
 
@@ -49,5 +49,5 @@ jobs:
         with:
           GIGALIXIR_USERNAME: ${{ secrets.GIGALIXIR_USERNAME }}
           GIGALIXIR_PASSWORD: ${{ secrets.GIGALIXIR_PASSWORD }}
-          GIGALIXIR_APP: ${{ secrets.GIGALIXIR_APP }}
+          GIGALIXIR_APP: ${{ secrets.GIGALIXIR_APP_DEV }}
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
