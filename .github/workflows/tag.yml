@@ -38,5 +38,13 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     steps:
-    - name: Hello
-      run: echo Hello world
+      - uses: actions/checkout@v2
+        with:
+          ref: master
+          fetch-depth: 0
+      - uses: mhanberg/gigalixir-action@0.1.0
+        with:
+          GIGALIXIR_USERNAME: ${{ secrets.GIGALIXIR_USERNAME }}
+          GIGALIXIR_PASSWORD: ${{ secrets.GIGALIXIR_PASSWORD }}
+          GIGALIXIR_APP: ${{ secrets.GIGALIXIR_APP_PROD }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
