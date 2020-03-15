@@ -91,6 +91,7 @@ defmodule Mauricio.CatChat do
     chat_pid = CatSup.get_chat(chat_id)
     Logger.log(:info, "Chat pid #{inspect(chat_pid)}")
     case {chat_pid, text} do
+      {_, nil} -> :ok
       {nil, @start_command<>_rest} ->
         Logger.log(:info, "Start chat #{chat_id} by command #{text}")
         CatSup.start_chat(chat_id)
