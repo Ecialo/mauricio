@@ -51,7 +51,7 @@ config :mauricio,
     """,
     hug: """
     <i><%= who.fname <> " " <> who.sname %> обнимает <%= state %> котика.
-    <%= cat.name %> <%= cat_action %>. Навскидку котейка весит </i><b><%= cat.weight %></b><i>кило и, кажется, <%= cat_dynamic %>.
+    <%= cat.name %> <%= cat_action %>. Навскидку котейка весит </i><b><%= cat.weight %></b><i> кило и, кажется, <%= cat_dynamic %>.
     Этот кот <%= laziness %>
     </i>
     """,
