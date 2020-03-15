@@ -191,7 +191,7 @@ defmodule Mauricio.CatChat.Chat do
         user.first_name,
         user.last_name,
         user.id,
-        3,
+        5,
         true
       )
     }
