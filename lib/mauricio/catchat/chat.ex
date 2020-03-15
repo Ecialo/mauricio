@@ -131,7 +131,7 @@ defmodule Mauricio.CatChat.Chat do
   end
   def schedule(%{cat: %Cat{laziness: laziness}}, event) do
     time = Application.get_env(:mauricio, :schedule)[event] * laziness # seconds
-    Process.send_after(self(), event, time * 1000)
+    Process.send_after(self(), event, time * 60 * 1000)
   end
 
   def handle_info(:tire, %{cat: cat, members: members} = state) do

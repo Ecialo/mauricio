@@ -45,7 +45,7 @@ defmodule Mauricio.CatChat.Cat.State do
       %Sleep{} -> "мирно спящего"
       %WantCare{times_not_pet: 0} -> "непонятно чего хотящего"
       %WantCare{times_not_pet: 1} -> "жаждущего ласки"
-      %WantCare{} -> "надоедливого"
+      %WantCare{} -> "изнывающего"
     end
 
     karma_level = Member.karma_level(who)
@@ -64,6 +64,8 @@ defmodule Mauricio.CatChat.Cat.State do
     dynamic = Cat.weight_dynamic(cat)
     cat_dynamic = state_dynamic_message(dynamic, karma_level, state)
 
+    laziness = Text.get_text([:laziness, cat.laziness])
+
     {
       %{cat | state: Awake.new},
       who,
@@ -73,7 +75,8 @@ defmodule Mauricio.CatChat.Cat.State do
         cat: cat,
         state: state_message,
         cat_action: cat_action,
-        cat_dynamic: cat_dynamic
+        cat_dynamic: cat_dynamic,
+        laziness: laziness
       )
     }
   end
