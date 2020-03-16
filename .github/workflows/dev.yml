@@ -47,7 +47,7 @@ jobs:
           fetch-depth: 0
       - uses: mhanberg/gigalixir-action@0.1.0
         with:
-          GIGALIXIR_USERNAME: ${{ secrets.GIGALIXIR_USERNAME }}
-          GIGALIXIR_PASSWORD: ${{ secrets.GIGALIXIR_PASSWORD }}
-          GIGALIXIR_APP: ${{ secrets.GIGALIXIR_APP_DEV }}
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          GIGALIXIR_USERNAME: ${{ secrets.DEV_GIGALIXIR_USERNAME }}
+          GIGALIXIR_PASSWORD: ${{ secrets.DEV_GIGALIXIR_PASSWORD }}
+          GIGALIXIR_APP: ${{ secrets.DEV_GIGALIXIR_APP }}
+          SSH_PRIVATE_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}
