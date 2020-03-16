@@ -45,12 +45,6 @@ jobs:
         with:
           ref: master
           fetch-depth: 0
-      - name: check secrets
-        run: echo "${GIGALIXIR_USERNAME}:${GIGALIXIR_PASSWORD}@${GIGALIXIR_APP}"
-        env:
-          GIGALIXIR_USERNAME: ${{ secrets.DEV_GIGALIXIR_USERNAME }}
-          GIGALIXIR_PASSWORD: ${{ secrets.DEV_GIGALIXIR_PASSWORD }}
-          GIGALIXIR_APP: ${{ secrets.DEV_GIGALIXIR_APP }}
       - uses: mhanberg/gigalixir-action@0.1.0
         with:
           GIGALIXIR_USERNAME: ${{ secrets.DEV_GIGALIXIR_USERNAME }}
