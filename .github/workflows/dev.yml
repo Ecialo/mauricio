@@ -45,17 +45,6 @@ jobs:
         with:
           ref: master
           fetch-depth: 0
-      - name: Create config/secret.exs
-        run: |
-          echo "import Config
-
-          config :nadia,
-            token: \"xxx\"
-
-          config :mauricio,
-            cat_api_token: \"xxx\",
-            dog_api_token: \"xxx\"
-          " >${GITHUB_WORKSPACE}/config/secret.exs && cat ${GITHUB_WORKSPACE}/config/secret.exs
       - uses: mhanberg/gigalixir-action@0.1.0
         with:
           GIGALIXIR_USERNAME: ${{ secrets.DEV_GIGALIXIR_USERNAME }}
