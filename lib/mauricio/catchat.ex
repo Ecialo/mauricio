@@ -82,7 +82,7 @@ defmodule Mauricio.CatChat do
     CatSup.start_link()
   end
 
-  def handle_update(%NadiaUpdate{message: message}, mode) do
+  def handle_update(%NadiaUpdate{message: message}, mode) when not is_nil(message) do
     %NadiaMessage{chat: chat, text: text} = message
     %NadiaChat{id: chat_id} = chat
 
@@ -91,12 +91,14 @@ defmodule Mauricio.CatChat do
     chat_pid = CatSup.get_chat(chat_id)
     Logger.log(:info, "Chat pid #{inspect(chat_pid)}")
     case {chat_pid, text} do
+      {_, nil} -> :ok
       {nil, @start_command<>_rest} ->
         Logger.log(:info, "Start chat #{chat_id} by command #{text}")
         CatSup.start_chat(chat_id)
         :ok
       {_, @help_command<>_rest} ->
         Nadia.send_message(chat_id, Text.get_text(:help))
+        :ok
       {chat_pid, @stop_command<>_rest} when not is_nil(chat_pid) ->
         Logger.log(:info, "Stop chat #{chat_id} with pid #{inspect(chat_pid)} by command #{text}")
         CatSup.stop_chat(chat_pid)
@@ -111,6 +113,11 @@ defmodule Mauricio.CatChat do
             :ok
         end
     end
+  end
+
+  def handle_update(update, _mode) do
+    Logger.warn(inspect(update))
+    :ok
   end
 
   def handle_cast({:process_update, update}, catsup_pid) do

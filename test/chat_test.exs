@@ -5,6 +5,7 @@ defmodule MauricioTest.Chat do
   alias Mauricio.CatChat.Cat.State.{Sleep, WantCare}
   alias MauricioTest.Helpers
   alias Mauricio.Text
+  alias Mauricio.Storage
 
   setup do
     {:ok, _} = :bookish_spork.start_server()
@@ -78,6 +79,17 @@ defmodule MauricioTest.Chat do
     Helpers.assert_capture_expected_text(:any)
     assert new_state.cat.satiety == state.cat.satiety + 1
     assert_receive :hungry
+  end
+
+  test "handle continue stored" do
+    state = chat_with_turbo_cat()
+    Storage.put(state)
+    {:noreply, start_state} = Chat.handle_continue(:start, 1)
+    assert start_state == state
+    for signal <- [:tire, :pine, :metabolic, :hungry] do
+      assert_receive signal
+    end
+    Storage.pop(1)
   end
 
 end

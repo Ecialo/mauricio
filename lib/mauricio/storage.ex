@@ -30,7 +30,7 @@ defmodule Mauricio.Storage do
     {:noreply, Map.put(storage, chat_id, chat)}
   end
 
-  def handle_cast({:pop, chat_id},_from, storage) do
+  def handle_cast({:pop, chat_id}, storage) do
     {_, ns} = Map.pop(storage, chat_id)
     {:noreply, ns}
   end

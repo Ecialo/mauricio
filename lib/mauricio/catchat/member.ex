@@ -9,7 +9,7 @@ defmodule Mauricio.CatChat.Member do
     karma: non_neg_integer,
     participant?: boolean
   }
-  defstruct [fname: nil, sname: nil, id: nil, karma: 3, participant?: false]
+  defstruct [fname: nil, sname: nil, id: nil, karma: 3, participant?: true]
 
   def new(fname, sname, id) do
     %Member{fname: fname, sname: sname, id: id}

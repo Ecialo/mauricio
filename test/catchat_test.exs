@@ -15,16 +15,16 @@ defmodule MauricioTest.CatChat do
   end
 
   test "create new chat then shutdown then again" do
-    {:noreply, nil} = CatChat.handle_cast({:process_update, Helpers.start_update}, nil)
+    :ok = CatChat.process_update(Helpers.start_update)
     assert DynamicSupervisor.count_children(Chats) == %{active: 1, specs: 1, supervisors: 0, workers: 1}
 
-    {:noreply, nil} = CatChat.handle_cast({:process_update, Helpers.stop_update}, nil)
+    :ok = CatChat.process_update(Helpers.stop_update)
     assert DynamicSupervisor.count_children(Chats) == %{active: 0, specs: 0, supervisors: 0, workers: 0}
 
-    {:noreply, nil} = CatChat.handle_cast({:process_update, Helpers.start_update}, nil)
+    :ok = CatChat.process_update(Helpers.start_update)
     assert DynamicSupervisor.count_children(Chats) == %{active: 1, specs: 1, supervisors: 0, workers: 1}
 
-    {:noreply, nil} = CatChat.handle_cast({:process_update, Helpers.stop_update}, nil)
+    :ok = CatChat.process_update(Helpers.stop_update)
     assert DynamicSupervisor.count_children(Chats) == %{active: 0, specs: 0, supervisors: 0, workers: 0}
   end
 
@@ -98,6 +98,60 @@ defmodule MauricioTest.CatChat.ResponseProcessing do
     st = Chat.process_message(message.("/become_annoying"), state)
     Helpers.assert_capture_expected_text(:any)
     assert st[:cat].laziness == round(laziness / 2)
+  end
+
+end
+
+defmodule MauricioTest.CatChat.Interaction do
+  use ExUnit.Case
+
+  alias Mauricio.Text
+  alias Mauricio.Storage
+  alias Mauricio.CatChat
+  alias Mauricio.CatChat.{Cat, Chat, Member}
+  alias Mauricio.CatChat.Chat.Interaction
+  alias MauricioTest.Helpers
+
+  setup do
+    {:ok, _} = :bookish_spork.start_server()
+    on_exit(&:bookish_spork.stop_server/0)
+    on_exit(&Storage.flush/0)
+
+    {:ok, %{}}
+  end
+
+  test "add to feeder" do
+    member = Member.new("A", "B", 1, 1, true)
+    s = %{cat: Cat.new("C"), feeder: :queue.new()}
+    {f, nil, _m} = Interaction.handle_command("/add_to_feeder", member, s)
+    assert {:value, "ничего"} == :queue.peek(f)
+    {f, nil, _m} = Interaction.handle_command("/add_to_feeder еда", member, s)
+    assert {:value, "еда"} == :queue.peek(f)
+    {f, nil, _m} = Interaction.handle_command("/add_to_feeder ", member, s)
+    assert {:value, "ничего"} == :queue.peek(f)
+    {f, nil, _m} = Interaction.handle_command("/add_to_feederеда", member, s)
+    assert {:value, "еда"} == :queue.peek(f)
+  end
+
+  test "multiuser chat" do
+    :ok = CatChat.process_update(Helpers.start_update)
+    :ok = CatChat.process_update(Helpers.update_with_text(1, "Валера"))
+
+    second_member_message = Helpers.update_with_text(1, 2, "123")
+    assert second_member_message.message.from.id == 2
+
+    :ok = CatChat.process_update(second_member_message)
+    {:ok, state} = Storage.fetch(1)
+    assert state.members[1].participant?
+    assert Map.has_key?(state.members, 2)
+    assert not state.members[2].participant?
+
+    :ok = CatChat.process_update(Helpers.update_with_text(1, 2, "Кскскс"))
+    {:ok, state} = Storage.fetch(1)
+    assert state.members[1].participant?
+    assert state.members[2].participant?
+
+    :ok = CatChat.process_update(Helpers.stop_update)
   end
 
 end

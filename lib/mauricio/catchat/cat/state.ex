@@ -45,7 +45,7 @@ defmodule Mauricio.CatChat.Cat.State do
       %Sleep{} -> "мирно спящего"
       %WantCare{times_not_pet: 0} -> "непонятно чего хотящего"
       %WantCare{times_not_pet: 1} -> "жаждущего ласки"
-      %WantCare{} -> "надоедливого"
+      %WantCare{} -> "изнывающего"
     end
 
     karma_level = Member.karma_level(who)
@@ -64,6 +64,8 @@ defmodule Mauricio.CatChat.Cat.State do
     dynamic = Cat.weight_dynamic(cat)
     cat_dynamic = state_dynamic_message(dynamic, karma_level, state)
 
+    laziness = Text.get_text([:laziness, cat.laziness])
+
     {
       %{cat | state: Awake.new},
       who,
@@ -73,7 +75,8 @@ defmodule Mauricio.CatChat.Cat.State do
         cat: cat,
         state: state_message,
         cat_action: cat_action,
-        cat_dynamic: cat_dynamic
+        cat_dynamic: cat_dynamic,
+        laziness: laziness
       )
     }
   end
@@ -86,8 +89,11 @@ defmodule Mauricio.CatChat.Cat.State do
 
   def react_to_triggers(_state, cat, who, triggers) do
     collect = fn tr, {cat, who, msgs} ->
-      {cat, who, msg} = react_to_trigger(tr, cat, who)
-      {cat, who, [msg | msgs]}
+      case react_to_trigger(tr, cat, who) do
+        nil -> {cat, who, msgs}
+        {cat, nil, msg} -> {cat, who, [msg | msgs]}
+        {cat, who, msg} -> {cat, who, [msg | msgs]}
+      end
     end
 
     {cat, who, msgs} =
@@ -95,6 +101,8 @@ defmodule Mauricio.CatChat.Cat.State do
 
     {cat, who, Enum.reverse(msgs)}
   end
+
+  defp react_to_trigger(:attract, _, _), do: nil
 
   defp react_to_trigger(:banish, cat, who) do
     {cat, %{who | participant?: false}, Text.get_text(:banished, cat: cat, who: who)}

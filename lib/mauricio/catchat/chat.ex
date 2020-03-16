@@ -66,7 +66,9 @@ defmodule Mauricio.CatChat.Chat do
   def handle_continue(:start, chat_id) do
     Logger.log(:info, "Continue Start for #{chat_id}")
     case Storage.fetch(chat_id) do
-      {:ok, chat} -> {:noreply, chat}
+      {:ok, chat} ->
+        schedule(chat, :all)
+        {:noreply, chat}
       :error ->
         send_message(chat_id, Text.get_text(:start))
         {:noreply, chat_id}
@@ -74,8 +76,13 @@ defmodule Mauricio.CatChat.Chat do
   end
 
   def handle_call(:stop, _from, state) do
-    # Logger.log(:info, "stop")
     {:stop, :normal, :ok, state}
+  end
+
+  def handle_call({:process_message, message}, _from, state) do
+    Logger.log(:info, "Handle regular")
+    new_state = process_message(message, state)
+    {:reply, :ok, new_state}
   end
 
   def terminate(:normal, %{chat_id: chat_id}) do
@@ -84,19 +91,20 @@ defmodule Mauricio.CatChat.Chat do
   end
   def terminate(:normal, _state), do: nil
 
-  @spec process_message(NadiaMessage.t, Chat.state) :: Chat.state
-  def process_message(message, state) do
-    responses = Interaction.process_message(message, state)
-    Responses.process_responses(responses, state)
-  end
-
-  def handle_cast({:process_message, message}, state) when is_map(state) do
+  def handle_cast({:process_message, message}, state) do
     Logger.log(:info, "Handle regular")
     new_state = process_message(message, state)
     {:noreply, new_state}
   end
 
-  def handle_cast({:process_message, %NadiaMessage{text: text} = message}, chat_id) do
+  @spec process_message(NadiaMessage.t, Chat.state) :: Chat.state
+  def process_message(message, state) when is_map(state) do
+    responses = Interaction.process_message(message, state)
+    new_state = Responses.process_responses(responses, state)
+    Storage.put_async(new_state)
+    new_state
+  end
+  def process_message(%NadiaMessage{text: text} = message, chat_id) do
     default_name = Application.get_env(:mauricio, :default_name)
     {name, key} = case text do
       nil -> {default_name, :noname_cat}
@@ -107,12 +115,15 @@ defmodule Mauricio.CatChat.Chat do
     state = new_state(chat_id, message, name)
 
     send_message(chat_id, Text.get_text(key, cat: state.cat))
+    schedule(state, :all)
 
-    schedule(state, [:tire, :pine, :metabolic, :hungry])
+    Storage.put_async(state)
 
-    {:noreply, state}
+    state
   end
 
+  def schedule(state, :all),
+    do: schedule(state, [:tire, :pine, :metabolic, :hungry])
   def schedule(_state, []) do end
   def schedule(state, [event | rest]) do
     schedule(state, event)
@@ -120,7 +131,7 @@ defmodule Mauricio.CatChat.Chat do
   end
   def schedule(%{cat: %Cat{laziness: laziness}}, event) do
     time = Application.get_env(:mauricio, :schedule)[event] * laziness # seconds
-    Process.send_after(self(), event, time * 1000)
+    Process.send_after(self(), event, time * 60 * 1000)
   end
 
   def handle_info(:tire, %{cat: cat, members: members} = state) do
@@ -180,7 +191,7 @@ defmodule Mauricio.CatChat.Chat do
         user.first_name,
         user.last_name,
         user.id,
-        3,
+        5,
         true
       )
     }

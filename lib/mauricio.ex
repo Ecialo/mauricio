@@ -5,7 +5,7 @@ defmodule Mauricio do
     update_provider =
       case Application.get_env(:mauricio, :update_provider) do
         :poller -> [{Mauricio.Poller, []}]
-        :acceptor -> [{Mauricio.Acceptor, []}]
+        :acceptor -> [{Mauricio.Acceptor, [port: 4000]}]
         nil -> []
       end
 
@@ -19,6 +19,7 @@ defmodule Mauricio do
   end
 
   def start_phase(:setup_webhook, :normal, _args) do
+    IO.puts("Start webhook")
     case {
       Application.get_env(:mauricio, :update_provider),
       Application.get_env(:mauricio, :url)
