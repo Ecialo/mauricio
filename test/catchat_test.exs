@@ -144,12 +144,12 @@ defmodule MauricioTest.CatChat.Interaction do
     {:ok, state} = Storage.fetch(1)
     assert state.members[1].participant?
     assert Map.has_key?(state.members, 2)
-    assert not state.members[2].participant?
+    assert state.members[2].participant?
 
-    :ok = CatChat.process_update(Helpers.update_with_text(1, 2, "Кскскс"))
+    :ok = CatChat.process_update(Helpers.update_with_text(1, 2, "Брысь"))
     {:ok, state} = Storage.fetch(1)
     assert state.members[1].participant?
-    assert state.members[2].participant?
+    assert not state.members[2].participant?
 
     :ok = CatChat.process_update(Helpers.stop_update)
   end
