@@ -102,6 +102,8 @@ defmodule Mauricio.CatChat.Cat.State do
     {cat, who, Enum.reverse(msgs)}
   end
 
+  defp react_to_trigger(:attract, _, _), do: nil
+
   defp react_to_trigger(:banish, cat, who) do
     {cat, %{who | participant?: false}, Text.get_text(:banished, cat: cat, who: who)}
   end
