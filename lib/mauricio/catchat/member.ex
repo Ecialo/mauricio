@@ -20,7 +20,7 @@ defmodule Mauricio.CatChat.Member do
   end
 
   def new(%NadiaUser{first_name: fname, last_name: sname, id: id}) do
-    new(fname, sname, id)
+    new(fname || "Anon", sname || "Anonych", id)
   end
 
   @spec change_karma(Member.t(), :inc | :dec) :: Member.t()
