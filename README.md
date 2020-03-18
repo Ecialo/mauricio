@@ -1,3 +1,5 @@
+![main](https://github.com/Ecialo/mauricio/workflows/dev/badge.svg)
+
 # Mauricio
 Наглый котик в телеграме. Реинкарнация старого [кота](https://github.com/Ecialo/kotbot), которого стало слишком больно поддерживать.
 
