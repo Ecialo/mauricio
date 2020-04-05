@@ -12,30 +12,29 @@ defmodule Mauricio.CatChat.Chat do
   alias __MODULE__, as: Chat
 
   @type chat_id() :: integer
+  @type chat() :: %{
+          members: %{optional(integer) => Member.t()},
+          chat_id: chat_id,
+          cat: Cat.t(),
+          feeder: feeder()
+        }
   @type message_id() :: integer
-  @type response_entity() :: :cat | :dog | String.t
+  @type response_entity() :: :cat | :dog | String.t()
   @type response() :: response_entity | {response_entity, message_id}
-  @type feeder() :: :queue.queue(String.t)
-  @type state() ::
-    chat_id
-    | %{
-        members: %{optional(integer) => Member.t},
-        chat_id: chat_id,
-        cat: Cat.t,
-        feeder: feeder()
-      }
+  @type feeder() :: :queue.queue(String.t())
+  @type state() :: chat_id() | chat()
   @type chat_update ::
-    nil
-    | {
-        nil | feeder() | Cat.t,
-        nil | Member.t | [Member.t],
-        nil | response | [response]
-      }
+          nil
+          | {
+              nil | feeder() | Cat.t(),
+              nil | Member.t() | [Member.t()],
+              nil | response | [response]
+            }
 
   @catchat_registry Registry.CatChat
 
-  defguard is_feeder(feeder) when
-    is_tuple(feeder) and is_list(elem(feeder, 0)) and is_list(elem(feeder, 1))
+  defguard is_feeder(feeder)
+           when is_tuple(feeder) and is_list(elem(feeder, 0)) and is_list(elem(feeder, 1))
 
   # Client
 
@@ -65,10 +64,12 @@ defmodule Mauricio.CatChat.Chat do
 
   def handle_continue(:start, chat_id) do
     Logger.log(:info, "Continue Start for #{chat_id}")
+
     case Storage.fetch(chat_id) do
       {:ok, chat} ->
         schedule(chat, :all)
         {:noreply, chat}
+
       :error ->
         send_message(chat_id, Text.get_text(:start))
         {:noreply, chat_id}
@@ -89,6 +90,7 @@ defmodule Mauricio.CatChat.Chat do
     Storage.pop(chat_id)
     send_message(chat_id, Text.get_text(:stop))
   end
+
   def terminate(:normal, _state), do: nil
 
   def handle_cast({:process_message, message}, state) do
@@ -97,20 +99,24 @@ defmodule Mauricio.CatChat.Chat do
     {:noreply, new_state}
   end
 
-  @spec process_message(NadiaMessage.t, Chat.state) :: Chat.state
+  @spec process_message(NadiaMessage.t(), Chat.state()) :: Chat.state()
   def process_message(message, state) when is_map(state) do
     responses = Interaction.process_message(message, state)
     new_state = Responses.process_responses(responses, state)
     Storage.put_async(new_state)
     new_state
   end
+
   def process_message(%NadiaMessage{text: text} = message, chat_id) do
     default_name = Application.get_env(:mauricio, :default_name)
-    {name, key} = case text do
-      nil -> {default_name, :noname_cat}
-      "" -> {default_name, :noname_cat}
-      name -> {name, :name_cat}
-    end
+
+    {name, key} =
+      case text do
+        nil -> {default_name, :noname_cat}
+        "" -> {default_name, :noname_cat}
+        name -> {name, :name_cat}
+      end
+
     name = String.capitalize(name)
     state = new_state(chat_id, message, name)
 
@@ -124,13 +130,18 @@ defmodule Mauricio.CatChat.Chat do
 
   def schedule(state, :all),
     do: schedule(state, [:tire, :pine, :metabolic, :hungry])
-  def schedule(_state, []) do end
+
+  def schedule(_state, []) do
+  end
+
   def schedule(state, [event | rest]) do
     schedule(state, event)
     schedule(state, rest)
   end
+
   def schedule(%{cat: %Cat{laziness: laziness}}, event) do
-    time = Application.get_env(:mauricio, :schedule)[event] * laziness # seconds
+    # seconds
+    time = Application.get_env(:mauricio, :schedule)[event] * laziness
     Process.send_after(self(), event, time * 60 * 1000)
   end
 
@@ -151,6 +162,7 @@ defmodule Mauricio.CatChat.Chat do
   def handle_info(:metabolic, %{cat: cat, members: members} = state) do
     {_, who} = Enum.random(members)
     state = cat |> Cat.metabolic(who) |> Responses.process_responses(state)
+
     if state.cat.weight >= 2 do
       schedule(state, :metabolic)
       {:noreply, state}
@@ -187,13 +199,14 @@ defmodule Mauricio.CatChat.Chat do
     cat = Cat.new(cat_name)
 
     members = %{
-      user.id => Member.new(
-        user.first_name,
-        user.last_name,
-        user.id,
-        5,
-        true
-      )
+      user.id =>
+        Member.new(
+          user.first_name,
+          user.last_name,
+          user.id,
+          5,
+          true
+        )
     }
 
     %{
@@ -227,6 +240,4 @@ defmodule Mauricio.CatChat.Chat do
   def send_message(chat_id, text, options) do
     Nadia.send_message(chat_id, text, options ++ [parse_mode: :HTML])
   end
-
 end
-

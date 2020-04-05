@@ -14,8 +14,17 @@ defmodule Mauricio.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      applications: [:nadia],
-      extra_applications: [:logger, :runtime_tools, :elli, :jason, :eex],
+      applications: [
+        :nadia,
+        :mongodb_driver
+      ],
+      extra_applications: [
+        :logger,
+        :runtime_tools,
+        :elli,
+        :jason,
+        :eex
+      ],
       mod: {Mauricio, []},
       start_phases: [setup_webhook: []],
     ]
@@ -27,6 +36,7 @@ defmodule Mauricio.MixProject do
       {:elli, "~> 3.2"},
       {:nadia, "~> 0.6.0"},
       {:jason, "~> 1.1"},
+      {:mongodb_driver, "~> 0.6"},
       {:bookish_spork, github: "tank-bohr/bookish_spork", only: :test},
       {:ex_parameterized, "~> 1.3.7", only: :test},
       {:dialyxir, "~> 1.0.0-rc.7", only: :dev, runtime: false},
