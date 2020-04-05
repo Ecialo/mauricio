@@ -187,13 +187,7 @@ defmodule Mauricio.CatChat.Chat do
     cat = Cat.new(cat_name)
 
     members = %{
-      user.id => Member.new(
-        user.first_name,
-        user.last_name,
-        user.id,
-        5,
-        true
-      )
+      user.id => Member.new(user)
     }
 
     %{
