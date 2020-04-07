@@ -10,6 +10,9 @@ defmodule MauricioTest.Helpers do
   alias Nadia.Model.User, as: NadiaUser
 
   alias Mauricio.CatChat.Chat
+  alias Mauricio.CatChat.Cat
+  alias Mauricio.CatChat.Cat.State.{Awake, Sleep}
+  alias Mauricio.Text
 
   def start_update do
     update_with_text(1, "/start")
@@ -128,6 +131,22 @@ defmodule MauricioTest.Helpers do
     assert_capture_expected_text(response)
 
     assert_dialog(new_state, rest)
+  end
+
+  def test_cat_falling_asleep(cat, member) do
+    expected = Text.get_all_texts(:sleep, who: member, cat: cat)
+    {cat, nil, text} = Cat.tire(cat, member)
+    assert weak_text_eq(text, expected)
+    assert cat.state == Sleep.new()
+    assert cat.energy == round(1 + cat.weight * 0.35)
+  end
+
+  def test_cat_waking_up(cat, member, key) do
+    expected = Text.get_all_texts(key, who: member, cat: cat)
+    {cat, nil, text} = Cat.tire(cat, member)
+    assert weak_text_eq(text, expected)
+    assert cat.state == Awake.new
+    assert cat.energy == cat.weight
   end
 
 end
