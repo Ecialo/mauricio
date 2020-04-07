@@ -26,7 +26,7 @@ defmodule MauricioTest.Chat do
     {:noreply, state} = Chat.handle_continue(:start, chat_id)
     Helpers.assert_capture_expected_text(Text.get_text(:start))
     dialog = [
-      {m.("Chertik"), "<i>Котeйке нравится имя Chertik</i>\n"}
+      {m.("крутой уокер "), "<i>Котeйке нравится имя Крутой Уокер</i>\n"}
     ]
     Helpers.assert_dialog(state, dialog)
     bad_dialog = [
