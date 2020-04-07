@@ -60,8 +60,7 @@ defmodule MauricioTest.Cat.State.Sleep do
   test "rest to awake" do
     member = Member.new("A", "B", 1, 1, true)
     cat = Cat.new("C", Sleep.new, 10, 0, 0)
-
-    expected = Text.get_all_texts(:wake_up, who: member, cat: cat)
+    expected = Text.get_all_texts(:wake_up_lazy, who: member, cat: cat)
     {cat, nil, text} = Cat.tire(cat, member)
     assert Helpers.weak_text_eq(text, expected)
     assert cat.state == Awake.new
