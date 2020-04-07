@@ -45,8 +45,8 @@ defmodule MauricioTest.Cat.State.Sleep do
     thin_cat = %{Cat.new("C", Sleep.new, 1, 0, 0) | energy: 0}
     cat = %{Cat.new("C", Sleep.new, 10, 0, 0) | energy: 0}
 
-    Helpers.test_cat_falling_asleep(thin_cat, member)
-    Helpers.test_cat_falling_asleep(cat, member)
+    test_cat_falling_asleep(thin_cat, member)
+    test_cat_falling_asleep(cat, member)
   end
 
   test "rest to awake" do
@@ -54,8 +54,24 @@ defmodule MauricioTest.Cat.State.Sleep do
     lazy_cat = Cat.new("LC", Sleep.new, 10, 0, 0)
     active_cat = Cat.new("AC", Sleep.new, 10, 0, 0, 32)
 
-    Helpers.test_cat_waking_up(lazy_cat, member, :wake_up_lazy)
-    Helpers.test_cat_waking_up(active_cat, member, :wake_up_active)
+    test_cat_waking_up(lazy_cat, member, :wake_up_lazy)
+    test_cat_waking_up(active_cat, member, :wake_up_active)
+  end
+
+  defp test_cat_falling_asleep(cat, member) do
+    expected = Text.get_all_texts(:sleep, who: member, cat: cat)
+    {cat, nil, text} = Cat.tire(cat, member)
+    assert Helpers.weak_text_eq(text, expected)
+    assert cat.state == Sleep.new()
+    assert cat.energy == round(1 + cat.weight * 0.35)
+  end
+
+  defp test_cat_waking_up(cat, member, key) do
+    expected = Text.get_all_texts(key, who: member, cat: cat)
+    {cat, nil, text} = Cat.tire(cat, member)
+    assert Helpers.weak_text_eq(text, expected)
+    assert cat.state == Awake.new
+    assert cat.energy == cat.weight
   end
 
 end
