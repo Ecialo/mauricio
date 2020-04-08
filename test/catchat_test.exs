@@ -105,10 +105,9 @@ end
 defmodule MauricioTest.CatChat.Interaction do
   use ExUnit.Case
 
-  alias Mauricio.Text
   alias Mauricio.Storage
   alias Mauricio.CatChat
-  alias Mauricio.CatChat.{Cat, Chat, Member}
+  alias Mauricio.CatChat.{Cat, Member}
   alias Mauricio.CatChat.Chat.Interaction
   alias MauricioTest.Helpers
 
