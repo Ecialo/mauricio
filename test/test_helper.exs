@@ -123,9 +123,13 @@ defmodule MauricioTest.Helpers do
     assert_dialog(state, [{{:process_message, message}, response} | rest])
   end
 
-  def assert_dialog(state, [{message, response} | rest]) do
+  def assert_dialog(state, [{{_action, message_struct} = message, response} | rest]) do
     {:noreply, new_state} = Chat.handle_cast(message, state)
-    assert_capture_expected_text(response)
+    body = body_of_captured_request()
+    assert weak_text_eq(Map.fetch!(body, "text"), response)
+
+    reply_to_message_id = body |> Map.fetch!("reply_to_message_id") |> String.to_integer()
+    assert reply_to_message_id == message_struct.message_id
 
     assert_dialog(new_state, rest)
   end

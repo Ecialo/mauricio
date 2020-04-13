@@ -104,7 +104,7 @@ defmodule Mauricio.CatChat.Chat do
     Storage.put_async(new_state)
     new_state
   end
-  def process_message(%NadiaMessage{text: text} = message, chat_id) do
+  def process_message(%NadiaMessage{text: text, message_id: message_id} = message, chat_id) do
     default_name = Application.get_env(:mauricio, :default_name)
     {name, key} = case text do
       nil -> {default_name, :noname_cat}
@@ -113,7 +113,9 @@ defmodule Mauricio.CatChat.Chat do
     end
     state = new_state(chat_id, message, capitalize_cat_name(name))
 
-    send_message(chat_id, Text.get_text(key, cat: state.cat))
+    response = Text.get_text(key, cat: state.cat)
+    send_message(chat_id, {response, message_id})
+
     schedule(state, :all)
 
     Storage.put_async(state)
