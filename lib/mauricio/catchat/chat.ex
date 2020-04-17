@@ -209,6 +209,11 @@ defmodule Mauricio.CatChat.Chat do
 
   def send_message(chat_id, response, options \\ [])
 
+  def send_message(chat_id, [response], options), do: send_message(chat_id, response, options)
+
+  def send_message(chat_id, {response, message_id}, options) when is_nil(message_id) do
+    send_message(chat_id, response, options)
+  end
   def send_message(chat_id, {response, message_id}, options),
     do: send_message(chat_id, response, options ++ [reply_to_message_id: message_id])
 
