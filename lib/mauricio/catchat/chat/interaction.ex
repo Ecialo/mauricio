@@ -14,7 +14,7 @@ defmodule Mauricio.CatChat.Chat.Interaction do
   @add_to_feeder_command "/add_to_feeder"
 
   def process_message(
-    %NadiaMessage{text: text, from: %NadiaUser{id: user_id} = nadia_user} = message,
+    %NadiaMessage{text: text, message_id: message_id, from: %NadiaUser{id: user_id} = nadia_user} = message,
     %{members: members} = state
   ) when not is_nil(text) do
     Logger.info("Message from user_id #{user_id} with text #{text}")
@@ -32,14 +32,20 @@ defmodule Mauricio.CatChat.Chat.Interaction do
       update -> update
     end
 
-    if new_member? do
+    {new_state, member, reply_data} = if new_member? do
       case update do
         nil -> {nil, chat_member, nil}
-        {su, nil, m} -> {su, chat_member, m}
+        {su, nil, stuff} -> {su, chat_member, stuff}
         update -> update
       end
     else
       update
+    end
+
+    case reply_data do
+      nil -> {new_state, member, nil}
+      {text, :do_reply} -> {new_state, member, {text, message_id}}
+      {text, :no_reply} -> {new_state, member, {text, nil}}
     end
   end
 
@@ -47,7 +53,7 @@ defmodule Mauricio.CatChat.Chat.Interaction do
     new_food_message = Text.get_text(:food_to_feeder, who: who, new_food: food)
     feeder = :queue.in(food, feeder)
     feeder_size = :queue.len(feeder)
-    if feeder_size > 5 do
+    response = if feeder_size > 5 do
       {{:value, old_food}, feeder} = :queue.out(feeder)
       overflow_message = Text.get_text(:feeder_overflow, old_food: old_food)
       result_message = Enum.join([new_food_message, "", overflow_message], "\n")
@@ -56,6 +62,7 @@ defmodule Mauricio.CatChat.Chat.Interaction do
     else
       {feeder, nil, new_food_message}
     end
+    response |> Cat.with_option(:do_reply)
   end
 
   def handle_command(
