@@ -5,19 +5,18 @@ defmodule Mauricio.CatChat.Member do
   @type t() :: %Member{
     fname: String.t,
     sname: String.t,
-    full_name: String.t,
     id: integer,
     karma: non_neg_integer,
     participant?: boolean
   }
-  defstruct [fname: nil, sname: nil, full_name: nil, id: nil, karma: 3, participant?: true]
+  defstruct [fname: nil, sname: nil, id: nil, karma: 3, participant?: true]
 
   def new(fname, sname, id) do
-    %Member{fname: fname, sname: sname, full_name: full_name(fname, sname), id: id}
+    %Member{fname: fname, sname: sname, id: id}
   end
 
   def new(fname, sname, id, karma, participant?) do
-    %Member{fname: fname, sname: sname, full_name: full_name(fname, sname), id: id, karma: karma, participant?: participant?}
+    %Member{fname: fname, sname: sname, id: id, karma: karma, participant?: participant?}
   end
 
   def new(%NadiaUser{first_name: fname, last_name: sname, id: id}) do
@@ -50,6 +49,6 @@ defmodule Mauricio.CatChat.Member do
   Call a user by their full name.
   Telegram guarantees that the first name is never empty, which may be not true for the last one.
   """
-  def full_name(fname, sname) when is_nil(sname), do: fname
-  def full_name(fname, sname), do: fname <> " " <> sname
+  def full_name(%Member{fname: fname, sname: sname}) when is_nil(sname), do: fname
+  def full_name(%Member{fname: fname, sname: sname}), do: fname <> " " <> sname
 end

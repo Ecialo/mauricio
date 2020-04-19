@@ -9,6 +9,13 @@ defmodule Mauricio.Text do
     | :mew
     | :eat
 
+  @doc """
+  Evaluate a template with the aid of custom functions.
+  """
+  def rich_eval(source, bindings) do
+    EEx.eval_string(source, bindings, [aliases: [{Member, Mauricio.CatChat.Member}]])
+  end
+
   def get_text(key, opts \\ []) do
     template = get_template(key)
     source =
@@ -17,14 +24,14 @@ defmodule Mauricio.Text do
         v -> v
       end
 
-    EEx.eval_string(source, opts)
+    rich_eval(source, opts)
   end
 
   def get_all_texts(key, opts \\ []) do
     template = get_template(key)
     case template do
-      v when is_list(v) -> Enum.map(v, &(EEx.eval_string(&1, opts)))
-      v -> [EEx.eval_string(v, opts)]
+      v when is_list(v) -> Enum.map(v, &(rich_eval(&1, opts)))
+      v -> [rich_eval(v, opts)]
     end
   end
 
