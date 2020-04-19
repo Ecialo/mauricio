@@ -107,6 +107,7 @@ defmodule MauricioTest.CatChat.Interaction do
 
   alias Mauricio.Storage
   alias Mauricio.CatChat
+  alias Mauricio.Text
   alias Mauricio.CatChat.{Cat, Member}
   alias Mauricio.CatChat.Chat.Interaction
   alias MauricioTest.Helpers
@@ -119,17 +120,38 @@ defmodule MauricioTest.CatChat.Interaction do
     {:ok, %{}}
   end
 
-  test "add to feeder" do
-    member = Member.new("A", "B", 1, 1, true)
-    s = %{cat: Cat.new("C"), feeder: :queue.new()}
-    {f, nil, _m} = Interaction.handle_command("/add_to_feeder", member, s)
-    assert {:value, "ничего"} == :queue.peek(f)
-    {f, nil, _m} = Interaction.handle_command("/add_to_feeder еда", member, s)
-    assert {:value, "еда"} == :queue.peek(f)
-    {f, nil, _m} = Interaction.handle_command("/add_to_feeder ", member, s)
-    assert {:value, "ничего"} == :queue.peek(f)
-    {f, nil, _m} = Interaction.handle_command("/add_to_feederеда", member, s)
-    assert {:value, "еда"} == :queue.peek(f)
+  describe "add to feeder" do
+    setup do
+      member = Member.new("A", "B", 1, 1, true)
+      s = %{cat: Cat.new("C"), feeder: :queue.new()}
+      %{member: member, s: s}
+    end
+
+    test "added nothing", %{member: member, s: s} do
+      expected_text = Text.get_text(:added_nothing, who: member)
+      {f, nil, message} = Interaction.handle_command("/add_to_feeder", member, s)
+      assert true == :queue.is_empty(f)
+      assert message == expected_text
+      {f, nil, message} = Interaction.handle_command("/add_to_feeder ", member, s)
+      assert true == :queue.is_empty(f)
+      assert message == expected_text
+    end
+
+    test "added cat itself", %{member: member, s: s} do
+      expected_text = Text.get_text(:added_self, who: member)
+      {f, nil, message} = Interaction.handle_command("/add_to_feeder@kotyarabot", member, s)
+      assert true == :queue.is_empty(f)
+      assert message == expected_text
+    end
+
+    test "added something", %{member: member, s: s} do
+      {f, nil, _m} = Interaction.handle_command("/add_to_feeder еда ", member, s)
+      assert {:value, "еда"} == :queue.peek(f)
+      {f, nil, _m} = Interaction.handle_command("/add_to_feederfood", member, s)
+      assert {:value, "food"} == :queue.peek(f)
+      {f, nil, _m} = Interaction.handle_command("/add_to_feedervery tasty food", member, s)
+      assert {:value, "very tasty food"} == :queue.peek(f)
+    end
   end
 
   test "multiuser chat" do
