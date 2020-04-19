@@ -12,6 +12,7 @@ defmodule Mauricio.CatChat.Chat.Interaction do
   @lazy_command "/become_lazy"
   @annoying_command "/become_annoying"
   @add_to_feeder_command "/add_to_feeder"
+  @cat_name "@kotyarabot"
 
   def process_message(
     %NadiaMessage{text: text, from: %NadiaUser{id: user_id} = nadia_user} = message,
@@ -43,18 +44,26 @@ defmodule Mauricio.CatChat.Chat.Interaction do
     end
   end
 
+  @doc """
+  Add something to feeder. Result depends on that "something":
+    * adding nothing or cat itself results in angry messages
+    * adding everything else results in queueing new item to feeder queue
+  """
+  def add_to_feeder(feeder, :nothing, who), do: {feeder, nil, Text.get_text(:added_nothing, who: who)}
+  def add_to_feeder(feeder, :self, who), do: {feeder, nil, Text.get_text(:added_self, who: who)}
   def add_to_feeder(feeder, food, who) do
     new_food_message = Text.get_text(:food_to_feeder, who: who, new_food: food)
     feeder = :queue.in(food, feeder)
     feeder_size = :queue.len(feeder)
+    feeder_content_message = Text.get_text(:feeder_content, all_food: :queue.to_list(feeder))
     if feeder_size > 5 do
       {{:value, old_food}, feeder} = :queue.out(feeder)
       overflow_message = Text.get_text(:feeder_overflow, old_food: old_food)
-      result_message = Enum.join([new_food_message, "", overflow_message], "\n")
+      result_message = Enum.join([new_food_message, "", overflow_message, "", feeder_content_message], "\n")
 
       {feeder, nil, result_message}
     else
-      {feeder, nil, new_food_message}
+      {feeder, nil, Enum.join([new_food_message, "", feeder_content_message], "\n")}
     end
   end
 
@@ -67,13 +76,12 @@ defmodule Mauricio.CatChat.Chat.Interaction do
     }) do
     case text do
       @add_to_feeder_command<>rest ->
-        food = case String.split(rest, " ", parts: 2) do
-          [""] -> "ничего"
-          [_, ""] -> "ничего"
-          [food] -> food
-          [_, food] -> food
+        food_tuple = case String.split(rest, " ", trim: true) do
+          [] -> :nothing
+          [@cat_name] -> :self
+          actual_food -> Enum.join(actual_food, " ")
         end
-        add_to_feeder(feeder, food, who)
+        add_to_feeder(feeder, food_tuple, who)
       @hug_command<>_rest -> Cat.hug(cat, who)
       @pet_command<>_rest -> Cat.pet(cat, who)
       @lazy_command<>_rest -> Cat.become_lazy(cat, who)
