@@ -20,7 +20,7 @@ defmodule Mauricio.CatChat.Member do
   end
 
   def new(%NadiaUser{first_name: fname, last_name: sname, id: id}) do
-    new(fname || "Anon", sname || "Anonych", id)
+    new(fname, sname, id)
   end
 
   @spec change_karma(Member.t(), :inc | :dec) :: Member.t()
@@ -45,4 +45,10 @@ defmodule Mauricio.CatChat.Member do
     %{id => member}
   end
 
+  @doc """
+  Call a user by their full name.
+  Telegram guarantees that the first name is never empty, which may be not true for the last one.
+  """
+  def full_name(%Member{fname: fname, sname: sname}) when is_nil(sname), do: fname
+  def full_name(%Member{fname: fname, sname: sname}), do: fname <> " " <> sname
 end

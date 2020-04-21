@@ -26,11 +26,11 @@ defmodule MauricioTest.Chat do
     {:noreply, state} = Chat.handle_continue(:start, chat_id)
     Helpers.assert_capture_expected_text(Text.get_text(:start))
     dialog = [
-      {m.("крутой уокер "), "<i>Котeйке нравится имя Крутой Уокер</i>\n"}
+      {m.("крутой уокер "), "<i>Котeйке нравится имя Крутой Уокер.</i>\n"}
     ]
     Helpers.assert_dialog(state, dialog)
     bad_dialog = [
-      {m.(""), "<i>Котик решил, что будет зваться Мяурицио</i>\n"}
+      {m.(""), "<i>Котик решил, что будет зваться Мяурицио.</i>\n"}
     ]
     %{cat: %Cat{name: name}} = Helpers.assert_dialog(state, bad_dialog)
     assert name == Application.get_env(:mauricio, :default_name)
