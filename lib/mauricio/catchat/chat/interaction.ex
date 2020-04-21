@@ -76,12 +76,12 @@ defmodule Mauricio.CatChat.Chat.Interaction do
     }) do
     case text do
       @add_to_feeder_command<>rest ->
-        food_tuple = case String.split(rest, " ", trim: true) do
+        food_to_add = case String.split(rest, " ", trim: true) do
           [] -> :nothing
           [@cat_name] -> :self
           actual_food -> Enum.join(actual_food, " ")
         end
-        add_to_feeder(feeder, food_tuple, who)
+        add_to_feeder(feeder, food_to_add, who)
       @hug_command<>_rest -> Cat.hug(cat, who)
       @pet_command<>_rest -> Cat.pet(cat, who)
       @lazy_command<>_rest -> Cat.become_lazy(cat, who)

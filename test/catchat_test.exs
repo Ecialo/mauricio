@@ -130,17 +130,17 @@ defmodule MauricioTest.CatChat.Interaction do
     test "added nothing", %{member: member, s: s} do
       expected_text = Text.get_text(:added_nothing, who: member)
       {f, nil, message} = Interaction.handle_command("/add_to_feeder", member, s)
-      assert true == :queue.is_empty(f)
+      assert :queue.is_empty(f)
       assert message == expected_text
       {f, nil, message} = Interaction.handle_command("/add_to_feeder ", member, s)
-      assert true == :queue.is_empty(f)
+      assert :queue.is_empty(f)
       assert message == expected_text
     end
 
     test "added cat itself", %{member: member, s: s} do
       expected_text = Text.get_text(:added_self, who: member)
       {f, nil, message} = Interaction.handle_command("/add_to_feeder@kotyarabot", member, s)
-      assert true == :queue.is_empty(f)
+      assert :queue.is_empty(f)
       assert message == expected_text
     end
 
@@ -151,6 +151,21 @@ defmodule MauricioTest.CatChat.Interaction do
       assert {:value, "food"} == :queue.peek(f)
       {f, nil, _m} = Interaction.handle_command("/add_to_feedervery tasty food", member, s)
       assert {:value, "very tasty food"} == :queue.peek(f)
+    end
+
+    test "added a very long name", %{member: member, s: s} do
+      food_name = """
+      Lorem ipsum dolor sit amet, sagittis fusce pulvinar pellentesque suscipit id amet, quisque tortor, lacus lectus nunc et fugit gravida et, fusce orci adipiscing nulla vitae id.
+      Aliquam natoque vel, ornare ut tincidunt nullam odio, ipsum vestibulum ullamcorper dignissim urna vestibulum vivamus, vivamus condimentum vehicula mollis eget ut.
+      A a eget nam nec, at nunc adipiscing turpis aenean volutpat, massa fringilla, vel ut, bibendum et vel ac justo ipsum blandit.
+      In non nec rutrum, neque porttitor eros dapibus. Accumsan nullam sit nullam malesuada, porta laoreet nam interdum gravida, vel venenatis amet amet dolor urna tellus.
+      Ipsum sed scelerisque nonummy velit, magna accumsan non a eu, felis augue malesuada non etiam duis, nec fusce ut velit vestibulum nam donec, nam quis morbi.
+      Consectetuer tellus in aut mauris ipsum, eros consectetuer amet nulla. Fermentum varius neque, pellentesque donec non a leo lectus, ridiculus sit auctor tellus vestibulum facilisis eleifend.
+      Sapien id purus mattis, non hymenaeos rutrum neque sed, elementum amet odio egestas et non mauris.
+      Eu sit at tortor commodo eu, dolor wisi in egestas suscipit non lorem, et turpis in, diam eget sit imperdiet pellentesque, proin dui sed orci.
+      """
+      {f, nil, _m} = Interaction.handle_command("/add_to_feeder" <> " " <> food_name, member, s)
+      assert {:value, food_name} == :queue.peek(f)
     end
   end
 
