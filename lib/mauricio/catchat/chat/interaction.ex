@@ -79,7 +79,7 @@ defmodule Mauricio.CatChat.Chat.Interaction do
         food_to_add = case String.split(rest, " ", trim: true) do
           [] -> :nothing
           [@cat_name] -> :self
-          actual_food -> Enum.join(actual_food, " ")
+          actual_food -> actual_food |> Enum.join(" ") |> String.replace(@cat_name, "")
         end
         add_to_feeder(feeder, food_to_add, who)
       @hug_command<>_rest -> Cat.hug(cat, who)
