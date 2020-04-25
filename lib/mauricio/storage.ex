@@ -8,13 +8,14 @@ defmodule Mauricio.Storage do
   @type status_reply(s) :: {:reply, :ok | :error, s}
   @type noreply(s) :: {:noreply, s}
 
-  @callback handle_fetch(Chat.chat_id(), pid(), any()) :: fetch_reply(any())
-  @callback handle_put(Chat.t(), pid(), any()) :: status_reply(any())
+  @callback handle_fetch(Chat.chat_id(), GenServer.from(), any()) :: fetch_reply(any())
+  @callback handle_put(Chat.t(), GenServer.from(), any()) :: status_reply(any())
+  @callback handle_flush(GenServer.from(), any()) :: status_reply(any())
+  @callback handle_pop(Chat.chat_id(), GenServer.from(), any()) :: status_reply(any())
+  @callback handle_save(Chat.chat_id(), GenServer.from(), any()) :: status_reply(any())
+
   @callback handle_put_async(Chat.t(), any()) :: noreply(any())
-  @callback handle_flush(pid(), any()) :: status_reply(any())
-  @callback handle_pop(Chat.chat_id(), pid(), any()) :: status_reply(any())
   @callback handle_pop_async(Chat.chat_id(), any()) :: noreply(any())
-  @callback handle_save(Chat.chat_id(), pid(), any()) :: status_reply(any())
   @callback handle_save_async(Chat.chat_id(), any()) :: noreply(any())
 
   def name do
