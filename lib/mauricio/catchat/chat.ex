@@ -117,8 +117,7 @@ defmodule Mauricio.CatChat.Chat do
         name -> {name, :name_cat}
       end
 
-    name = String.capitalize(name)
-    state = new_state(chat_id, message, name)
+    state = new_state(chat_id, message, capitalize_cat_name(name))
 
     send_message(chat_id, Text.get_text(key, cat: state.cat))
     schedule(state, :all)
@@ -199,14 +198,7 @@ defmodule Mauricio.CatChat.Chat do
     cat = Cat.new(cat_name)
 
     members = %{
-      user.id =>
-        Member.new(
-          user.first_name,
-          user.last_name,
-          user.id,
-          5,
-          true
-        )
+      user.id => Member.new(user)
     }
 
     %{
@@ -239,5 +231,9 @@ defmodule Mauricio.CatChat.Chat do
 
   def send_message(chat_id, text, options) do
     Nadia.send_message(chat_id, text, options ++ [parse_mode: :HTML])
+  end
+
+  defp capitalize_cat_name(name) do
+    name |> String.split() |> Enum.map(&String.capitalize/1) |> Enum.join(" ")
   end
 end

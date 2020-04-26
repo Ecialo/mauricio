@@ -10,7 +10,7 @@ defmodule MauricioTest.Cat.State do
     member = Member.new("A", "B", 1, 1, true)
     cat = Cat.new("C", Awake.new, 1, 1, 0)
     triggers = Text.find_triggers("Скушай!") |> IO.inspect()
-    r = State.react_to_triggers(nil, cat, member, triggers)
+    State.react_to_triggers(nil, cat, member, triggers)
   end
 
   test "hug" do

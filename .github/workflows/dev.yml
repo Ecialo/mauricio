@@ -1,0 +1,55 @@
+name: dev
+
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Create config/secret.exs
+      run: |
+        echo "import Config
+        
+        config :nadia,
+          token: \"xxx\"
+        
+        config :mauricio,
+          cat_api_token: \"xxx\",
+          dog_api_token: \"xxx\"
+        " >${GITHUB_WORKSPACE}/config/secret.exs && cat ${GITHUB_WORKSPACE}/config/secret.exs
+    - name: Setup elixir
+      uses: actions/setup-elixir@v1
+      with:
+        elixir-version: 1.10.2 # Define the elixir version [required]
+        otp-version: 22.2 # Define the OTP version [required]
+    - name: Install Dependencies
+      run: mix deps.get
+    - name: Run test (and create coverage report)
+      run: MIX_ENV=test mix coveralls.json
+    - name: Upload coverage results
+      run: bash <(curl -s https://codecov.io/bash)
+
+  deploy_dev:
+    needs: test
+    if: github.ref == 'refs/heads/master'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: master
+          fetch-depth: 0
+      - uses: mhanberg/gigalixir-action@0.1.0
+        with:
+          GIGALIXIR_USERNAME: ${{ secrets.DEV_GIGALIXIR_USERNAME }}
+          GIGALIXIR_PASSWORD: ${{ secrets.DEV_GIGALIXIR_PASSWORD }}
+          GIGALIXIR_APP: ${{ secrets.DEV_GIGALIXIR_APP }}
+          SSH_PRIVATE_KEY: ${{ secrets.DEV_SSH_PRIVATE_KEY }}

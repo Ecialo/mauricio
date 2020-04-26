@@ -7,7 +7,8 @@ defmodule Mauricio.MixProject do
       version: "0.2.0",
       elixir: "~> 1.10",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 
@@ -40,7 +41,8 @@ defmodule Mauricio.MixProject do
       {:bookish_spork, github: "tank-bohr/bookish_spork", only: :test},
       {:ex_parameterized, "~> 1.3.7", only: :test},
       {:dialyxir, "~> 1.0.0-rc.7", only: :dev, runtime: false},
-      {:rename, "~> 0.1.0", only: :dev}
+      {:rename, "~> 0.1.0", only: :dev},
+      {:excoveralls, "~> 0.12.3", only: :test},
     ]
   end
 end
