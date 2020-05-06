@@ -64,27 +64,48 @@ defmodule Mauricio.Storage do
       def handle_cast({:save, chat_id}, storage) do
         handle_save_async(chat_id, storage)
       end
+
+      defp from_self(), do: {self(), nil}
+
+      def handle_put_async(chat, storage) do
+        {:reply, :ok, ns} = handle_put(chat, from_self(), storage)
+        {:noreply, ns}
+      end
+
+      def handle_pop_async(chat_id, storage) do
+        {:reply, :ok, ns} = handle_pop(chat_id, from_self(), storage)
+        {:noreply, ns}
+      end
+
+      def handle_save_async(chat_id, storage) do
+        {:reply, :ok, ns} = handle_save(chat_id, from_self(), storage)
+        {:noreply, ns}
+      end
+
+      defoverridable from_self: 0, handle_put_async: 2, handle_pop_async: 2, handle_save_async: 2
     end
   end
 
-  def put(chat) do
-    GenServer.call(Storage, {:put, chat})
+  @spec put(Chat.t(), atom | pid | {atom, any} | {:via, atom, any}) :: :ok | :error
+  def put(chat, storage \\ Storage) do
+    GenServer.call(storage, {:put, chat})
   end
 
-  def put_async(chat) do
-    GenServer.cast(Storage, {:put, chat})
+  def put_async(chat, storage \\ Storage) do
+    GenServer.cast(storage, {:put, chat})
   end
 
-  def fetch(chat_id) do
-    GenServer.call(Storage, {:fetch, chat_id})
+  @spec fetch(Chat.chat_id(), atom | pid | {atom, any} | {:via, atom, any}) :: {:ok, Chat.t()} | :error
+  def fetch(chat_id, storage \\ Storage) do
+    GenServer.call(storage, {:fetch, chat_id})
   end
 
-  def flush() do
-    GenServer.call(Storage, :flush)
+  def flush(storage \\ Storage) do
+    GenServer.call(storage, :flush)
   end
 
-  def pop(chat_id) do
-    GenServer.cast(Storage, {:pop, chat_id})
+  def pop(chat_id, storage \\ Storage) do
+    GenServer.cast(storage, {:pop, chat_id})
   end
 
   def save(_), do: :ok

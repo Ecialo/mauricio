@@ -36,6 +36,10 @@ defmodule Mauricio.CatChat.Chat do
   defguard is_feeder(feeder)
            when is_tuple(feeder) and is_list(elem(feeder, 0)) and is_list(elem(feeder, 1))
 
+  def new(chat_id, members, cat, feeder) do
+    %{members: members, chat_id: chat_id, cat: cat, feeder: feeder}
+  end
+
   # Client
 
   @spec start_link(any) :: :ignore | {:error, any} | {:ok, pid}
@@ -201,12 +205,13 @@ defmodule Mauricio.CatChat.Chat do
       user.id => Member.new(user)
     }
 
-    %{
-      members: members,
-      cat: cat,
-      chat_id: chat_id,
-      feeder: :queue.new()
-    }
+    new(chat_id, members, cat, :queue.new())
+    # %{
+    #   members: members,
+    #   cat: cat,
+    #   chat_id: chat_id,
+    #   feeder: :queue.new()
+    # }
   end
 
   def get_name(chat_id) do

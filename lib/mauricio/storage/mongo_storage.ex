@@ -9,9 +9,9 @@ defmodule Mauricio.Storage.MongoStorage do
     Mongo.start_link(opts)
   end
 
-  def start_link(arg \\ nil) do
-    name = arg || Storage
-    GenServer.start_link(Storage, nil, name: name)
+  def start_link(opts \\ [], name \\ nil) do
+    name = name || Storage
+    GenServer.start_link(Storage, opts, name: name)
   end
 
   @spec handle_fetch(Chat.chat_id(), GenServer.from(), storage()) :: fetch_reply()
@@ -46,24 +46,24 @@ defmodule Mauricio.Storage.MongoStorage do
     {:reply, :ok, storage}
   end
 
-  @spec handle_put_async(Chat.t(), storage()) :: noreply()
-  def handle_put_async(chat, storage) do
-    {:reply, :ok, state} = handle_put(chat, from_self(), storage)
-    {:noreply, state}
-  end
+  # @spec handle_put_async(Chat.t(), storage()) :: noreply()
+  # def handle_put_async(chat, storage) do
+  #   {:reply, :ok, state} = handle_put(chat, from_self(), storage)
+  #   {:noreply, state}
+  # end
 
-  @spec handle_pop_async(Chat.chat_id(), storage()) :: noreply()
-  def handle_pop_async(chat_id, storage) do
-    {:reply, :ok, ns} = handle_pop(chat_id, from_self(), storage)
-    {:noreply, ns}
-  end
+  # @spec handle_pop_async(Chat.chat_id(), storage()) :: noreply()
+  # def handle_pop_async(chat_id, storage) do
+  #   {:reply, :ok, ns} = handle_pop(chat_id, from_self(), storage)
+  #   {:noreply, ns}
+  # end
 
-  @spec handle_save_async(Chat.chat_id(), storage()) :: noreply()
-  def handle_save_async(_chat_id, storage) do
-    {:noreply, storage}
-  end
+  # @spec handle_save_async(Chat.chat_id(), storage()) :: noreply()
+  # def handle_save_async(_chat_id, storage) do
+  #   {:noreply, storage}
+  # end
 
-  defp from_self(), do: {self(), nil}
+  # defp from_self(), do: {self(), nil}
 
   @spec encode_chat(Chat.chat_id()) :: map()
   defp encode_chat(chat) do

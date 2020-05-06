@@ -10,8 +10,8 @@ defmodule Mauricio do
       end
 
     children = [
-      {Mauricio.CatChat, []},
-      {Mauricio.Storage, []}
+      {Mauricio.CatChat, []}
+      # {Mauricio.Storage, []}
       | update_provider
     ]
 
