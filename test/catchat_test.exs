@@ -167,6 +167,15 @@ defmodule MauricioTest.CatChat.Interaction do
       {f, nil, _m} = Interaction.handle_command("/add_to_feeder" <> " " <> food_name, member, s)
       assert {:value, food_name} == :queue.peek(f)
     end
+
+    test "feeder overflow", %{member: member, s: %{cat: c}} do
+      f = :queue.from_list(~w(1 2 3 4 5))
+      {f, nil, _m} = Interaction.handle_command("/add_to_feeder 6", member, %{cat: c, feeder: f})
+      feeder_content_message = Text.get_text(:feeder_content, all_food: :queue.to_list(f))
+      assert :queue.member("6", f)
+      refute :queue.member("1", f)
+      refute String.contains?(feeder_content_message, "1")
+    end
   end
 
   test "multiuser chat" do
