@@ -66,9 +66,6 @@ defmodule Mauricio.CatChat do
 
   alias Mauricio.CatChat.Supervisor, as: CatSup
   alias Mauricio.Text
-  alias Nadia.Model.Update, as: NadiaUpdate
-  alias Nadia.Model.Message, as: NadiaMessage
-  alias Nadia.Model.Chat, as: NadiaChat
 
   @start_command "/start"
   @stop_command "/stop"
@@ -82,10 +79,8 @@ defmodule Mauricio.CatChat do
     CatSup.start_link()
   end
 
-  def handle_update(%NadiaUpdate{message: message}, mode) when not is_nil(message) do
-    %NadiaMessage{chat: chat, text: text} = message
-    %NadiaChat{id: chat_id} = chat
-
+  def handle_update(%{message: %{chat: %{id: chat_id}, text: text} = message}, mode)
+      when not is_nil(message) do
     Logger.log(:info, "Message from #{chat_id} with text #{text}")
 
     chat_pid = CatSup.get_chat(chat_id)
@@ -132,7 +127,7 @@ defmodule Mauricio.CatChat do
   def process_update(update, mode \\ :sync)
   def process_update(update, :async),
     do: GenServer.cast(__MODULE__, {:process_update, update})
-  def process_update(%NadiaUpdate{message: message} = update, :sync) do
+  def process_update(%{message: message} = update, :sync) do
     case GenServer.call(__MODULE__, {:process_update, update}) do
       :ok -> :ok
       chat_pid ->

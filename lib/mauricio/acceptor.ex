@@ -1,6 +1,10 @@
 defmodule Mauricio.Acceptor do
   require Logger
   alias Mauricio.CatChat
+  alias Nadia.Model.Update, as: NadiaUpdate
+  alias Nadia.Model.Message, as: NadiaMessage
+  alias Nadia.Model.Chat, as: NadiaChat
+
   @behaviour :elli_handler
 
   @tg_token Application.get_env(:nadia, :token)
@@ -17,7 +21,7 @@ defmodule Mauricio.Acceptor do
     |> List.wrap()
     |> Nadia.Parser.parse_result("getUpdates")
     |> hd()
-    |> CatChat.process_update()
+    |> call_process_update()
 
     {200, [], ""}
   end
@@ -28,6 +32,22 @@ defmodule Mauricio.Acceptor do
 
   defp handle(_, _, _req) do
     {404, [], "Our princess is in another castle..."}
+  end
+
+  defp call_process_update(%NadiaUpdate{
+         message: %NadiaMessage{
+           chat: %NadiaChat{id: chat_id},
+           date: date,
+           from: from,
+           message_id: message_id,
+           text: text
+         },
+         update_id: update_id
+       }) do
+    CatChat.process_update(%{
+      message: %{chat: %{id: chat_id}, date: date, from: from, message_id: message_id, text: text},
+      update_id: update_id
+    })
   end
 
   @impl :elli_handler
