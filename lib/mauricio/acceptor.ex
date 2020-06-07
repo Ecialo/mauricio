@@ -55,7 +55,6 @@ defmodule Mauricio.Acceptor do
 
   def start_link(args) do
     Logger.info("Start Acceptor")
-    IO.inspect(args)
 
     :elli.start_link(
       port: args[:port],

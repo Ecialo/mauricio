@@ -18,7 +18,7 @@ defmodule Mauricio.MixProject do
       applications: [:nadia],
       extra_applications: [:logger, :runtime_tools, :elli, :jason, :eex],
       mod: {Mauricio, []},
-      start_phases: [setup_webhook: []],
+      start_phases: [setup_webhook: []]
     ]
   end
 
@@ -33,7 +33,8 @@ defmodule Mauricio.MixProject do
       {:dialyxir, "~> 1.0.0-rc.7", only: :dev, runtime: false},
       {:rename, "~> 0.1.0", only: :dev},
       {:excoveralls, "~> 0.12.3", only: :test},
-      {:ex_doc, "~> 0.21.3", dev: true, runtime: false}
+      {:ex_doc, "~> 0.21.3", dev: true, runtime: false},
+      {:credo, "~> 1.4.0", only: :dev, runtime: false}
     ]
   end
 end
