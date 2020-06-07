@@ -37,15 +37,6 @@ defmodule Mauricio.CatChat.Cat.State do
   end
 
   def hug(state, cat, who) do
-    state_message =
-      case state do
-        %Awake{} -> "бегающего туда-сюда"
-        %Sleep{} -> "мирно спящего"
-        %WantCare{times_not_pet: 0} -> "непонятно чего хотящего"
-        %WantCare{times_not_pet: 1} -> "жаждущего ласки"
-        %WantCare{} -> "изнывающего"
-      end
-
     karma_level = Member.karma_level(who)
 
     karma_action =
@@ -56,19 +47,6 @@ defmodule Mauricio.CatChat.Cat.State do
         :bad_karma -> "шипит и вырывается"
       end
 
-    state_prefix =
-      case state do
-        %Sleep{} -> "просыпается, а затем "
-        _ -> ""
-      end
-
-    cat_action = state_prefix <> karma_action
-
-    dynamic = Cat.weight_dynamic(cat)
-    cat_dynamic = state_dynamic_message(dynamic, karma_level, state)
-
-    laziness = Text.get_text([:laziness, cat.laziness])
-
     {
       %{cat | state: Awake.new()},
       who,
@@ -76,13 +54,39 @@ defmodule Mauricio.CatChat.Cat.State do
         :hug,
         who: who,
         cat: cat,
-        state: state_message,
-        cat_action: cat_action,
-        cat_dynamic: cat_dynamic,
-        laziness: laziness
+        state: common_state_message(state),
+        cat_action: state_prefix(state) <> karma_action,
+        cat_dynamic: cat_dynamic(cat, karma_level, state),
+        laziness: cat_laziness(cat)
       )
     }
   end
+
+  defp common_state_message(state) do
+    case state do
+      %Awake{} -> "бегающего туда-сюда"
+      %Sleep{} -> "мирно спящего"
+      %WantCare{times_not_pet: 0} -> "непонятно чего хотящего"
+      %WantCare{times_not_pet: 1} -> "жаждущего ласки"
+      %WantCare{} -> "изнывающего"
+    end
+  end
+
+  defp state_prefix(state) do
+    case state do
+      %Sleep{} -> "просыпается, а затем "
+      _ -> ""
+    end
+  end
+
+  defp cat_dynamic(cat, karma_level, state) do
+    cat
+    |> Cat.weight_dynamic
+    |> state_dynamic_message(karma_level, state)
+
+  end
+
+  defp cat_laziness(cat), do: Text.get_text([:laziness, cat.laziness])
 
   def react_to_triggers(_state, cat, %Member{participant?: false} = who, triggers) do
     if :attract in triggers do

@@ -26,7 +26,7 @@ defmodule MauricioTest.Cat.State.Awake do
       who: who,
       cat: cat
     } do
-      cat = %{cat | times_pet: 10000}
+      cat = %{cat | times_pet: 10_000}
       expected_text = Text.get_all_texts(:bad_pet, who: who, cat: cat)
       {cat, _member, text} = Cat.pet(cat, who)
 
@@ -188,7 +188,7 @@ defmodule MauricioTest.Cat.State.Awake do
     test "react to triggers" do
       member = Member.new("A", "B", 1, 1, true)
       cat = Cat.new("C", Awake.new(), 1, 1, 0)
-      triggers = Text.find_triggers("Скушай!") |> IO.inspect()
+      triggers = Text.find_triggers("Скушай!")
       State.react_to_triggers(nil, cat, member, triggers)
     end
   end
