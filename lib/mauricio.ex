@@ -20,15 +20,19 @@ defmodule Mauricio do
 
   def start_phase(:setup_webhook, :normal, _args) do
     IO.puts("Start webhook")
+
     case {
       Application.get_env(:mauricio, :update_provider),
       Application.get_env(:mauricio, :url)
     } do
       {:acceptor, url} when not is_nil(url) ->
         Mauricio.Acceptor.set_webhook(url)
-      {:poller, _} -> Nadia.delete_webhook()
-      _anything_else -> :ok
+
+      {:poller, _} ->
+        Nadia.delete_webhook()
+
+      _anything_else ->
+        :ok
     end
   end
-
 end

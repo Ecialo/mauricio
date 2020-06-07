@@ -13,6 +13,7 @@ defmodule MauricioTest.TextTest do
     text = """
     Кстати скушай няшную котлетку!
     """
+
     triggers = Text.find_triggers(text)
     assert [:loud, :attract, :cat, :eat, :mew] == triggers
   end
@@ -24,12 +25,13 @@ defmodule MauricioTest.TextTest do
   test "complex template" do
     cat = Cat.new("Пень")
     who = Member.new("Лол", "Кек", 1)
-    assert Text.get_text([:satiety, 10, 1], who: who, cat: cat) == """
-    <i>Пень не притрагивается к еде и смотрит на Лол Кек тяжелым взглядом, полным бесконечного презрения.</i>
-    """
-    assert Text.get_text([:satiety, 10, 1], who: :feeder, cat: cat) == """
-    <i>Пень не притрагивается к еде и смотрит на кормушку тяжелым взглядом, полным бесконечного презрения.</i>
-    """
-  end
 
+    assert Text.get_text([:satiety, 10, 1], who: who, cat: cat) == """
+           <i>Пень не притрагивается к еде и смотрит на Лол Кек тяжелым взглядом, полным бесконечного презрения.</i>
+           """
+
+    assert Text.get_text([:satiety, 10, 1], who: :feeder, cat: cat) == """
+           <i>Пень не притрагивается к еде и смотрит на кормушку тяжелым взглядом, полным бесконечного презрения.</i>
+           """
+  end
 end

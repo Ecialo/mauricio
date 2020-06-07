@@ -11,10 +11,11 @@ defmodule MauricioTest.Member do
 
   test "check string formatting" do
     assert Text.get_text(:awake_pet, who: Member.new("Ivan", "Ivanov", 1)) == """
-    <i>Ivan Ivanov гладит котяру.</i>
-    """
+           <i>Ivan Ivanov гладит котяру.</i>
+           """
+
     assert Text.get_text(:awake_pet, who: Member.new("Ivan", nil, 1)) == """
-    <i>Ivan гладит котяру.</i>
-    """
+           <i>Ivan гладит котяру.</i>
+           """
   end
 end

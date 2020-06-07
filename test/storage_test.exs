@@ -25,7 +25,7 @@ defmodule MauricioTest.Storage do
   test "preserve chats" do
     assert Storage.fetch(1) == :error
 
-    CatChat.process_update(Helpers.start_update)
+    CatChat.process_update(Helpers.start_update())
     assert Storage.fetch(1) == :error
 
     CatChat.process_update(Helpers.update_with_text(1, "Витёк"))
@@ -36,8 +36,7 @@ defmodule MauricioTest.Storage do
     {:ok, new_state} = Storage.fetch(1)
     assert new_state.cat.satiety == state.cat.satiety + 1
 
-    CatChat.process_update(Helpers.stop_update)
+    CatChat.process_update(Helpers.stop_update())
     assert Storage.fetch(1) == :error
   end
-
 end

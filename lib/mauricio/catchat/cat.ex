@@ -1,36 +1,53 @@
 defmodule Mauricio.CatChat.Cat do
-
   alias __MODULE__, as: Cat
   alias Mauricio.CatChat.Cat.CatState
   alias Mauricio.CatChat.Cat.State.Awake
   alias Mauricio.Text
 
   @type t() :: %Cat{
-    name: String.t,
-    state: CatState.t,
-    weight: non_neg_integer,
-    satiety: non_neg_integer,
-    times_pet: non_neg_integer,
-    laziness: pos_integer,
-    energy: {non_neg_integer, non_neg_integer}
-  }
+          name: String.t(),
+          state: CatState.t(),
+          weight: non_neg_integer,
+          satiety: non_neg_integer,
+          times_pet: non_neg_integer,
+          laziness: pos_integer,
+          energy: {non_neg_integer, non_neg_integer}
+        }
 
-  defstruct [name: nil, state: nil, weight: 5, satiety: 3, times_pet: 0, laziness: 64, energy: 5, reqs: 0]
+  defstruct name: nil,
+            state: nil,
+            weight: 5,
+            satiety: 3,
+            times_pet: 0,
+            laziness: 64,
+            energy: 5,
+            reqs: 0
 
   def new(name) do
-    %Cat{name: name, state: Awake.new}
+    %Cat{name: name, state: Awake.new()}
   end
+
   def new(name, state, weight, satiety, times_pet, laziness \\ 64) do
-    %Cat{name: name, state: state, weight: weight, satiety: satiety, times_pet: times_pet, laziness: laziness, energy: weight}
+    %Cat{
+      name: name,
+      state: state,
+      weight: weight,
+      satiety: satiety,
+      times_pet: times_pet,
+      laziness: laziness,
+      energy: weight
+    }
   end
 
   def become_lazy(cat = %Cat{laziness: 1024}, who),
     do: {cat, who, Text.get_text(:over_lazy)}
+
   def become_lazy(cat = %Cat{laziness: l}, who),
     do: {%{cat | laziness: l * 2}, who, Text.get_text(:become_lazy)}
 
   def become_annoying(cat = %Cat{laziness: 1}, who),
     do: {cat, who, Text.get_text(:over_annoying)}
+
   def become_annoying(cat = %Cat{laziness: l}, who),
     do: {%{cat | laziness: round(l / 2)}, who, Text.get_text(:become_annoying)}
 
@@ -59,12 +76,15 @@ defmodule Mauricio.CatChat.Cat do
   end
 
   def change_energy(%Cat{energy: 0} = cat, :dec), do: cat
+
   def change_energy(%Cat{energy: energy} = cat, :dec),
     do: %{cat | energy: energy - 1}
 
   def change_weight(cat, :ok), do: cat
+
   def change_weight(cat = %Cat{weight: weight}, :inc),
     do: %{cat | weight: weight + 1}
+
   def change_weight(cat = %Cat{weight: weight}, :dec),
     do: %{cat | weight: max(0, weight - 1)}
 
@@ -121,5 +141,4 @@ defmodule Mauricio.CatChat.Cat do
 
   def react_to_triggers(cat = %Cat{state: state}, who, triggers),
     do: CatState.react_to_triggers(state, cat, who, triggers)
-
 end
