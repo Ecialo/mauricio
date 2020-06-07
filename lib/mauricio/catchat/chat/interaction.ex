@@ -63,6 +63,7 @@ defmodule Mauricio.CatChat.Chat.Interaction do
     new_food_message = Text.get_text(:food_to_feeder, who: who, new_food: food)
     feeder = :queue.in(food, feeder)
     feeder_size = :queue.len(feeder)
+
     if feeder_size > 5 do
       {{:value, old_food}, feeder} = :queue.out(feeder)
 
