@@ -20,7 +20,7 @@ defmodule Mauricio.CatChat.Cat.State.WantCare do
   end
 
   defimpl CatState do
-    def pet(%WantCare{}, cat = %Cat{times_pet: n}, who) do
+    def pet(%WantCare{}, %Cat{times_pet: n} = cat, who) do
       {
         %{cat | state: Awake.new(), times_pet: n + 1},
         Member.change_karma(who, :inc),

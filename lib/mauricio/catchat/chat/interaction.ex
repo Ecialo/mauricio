@@ -90,14 +90,7 @@ defmodule Mauricio.CatChat.Chat.Interaction do
       ) do
     case text do
       @add_to_feeder_command <> rest ->
-        food_to_add =
-          case String.split(rest, " ", trim: true) do
-            [] -> :nothing
-            [@cat_name] -> :self
-            actual_food -> actual_food |> Enum.join(" ") |> String.replace(@cat_name, "")
-          end
-
-        add_to_feeder(feeder, food_to_add, who)
+        handle_add_to_feeder_command(feeder, who, rest)
 
       @hug_command <> _rest ->
         Cat.hug(cat, who)
@@ -114,6 +107,17 @@ defmodule Mauricio.CatChat.Chat.Interaction do
       _ ->
         nil
     end
+  end
+
+  defp handle_add_to_feeder_command(feeder, who, rest) do
+    food_to_add =
+      case String.split(rest, " ", trim: true) do
+        [] -> :nothing
+        [@cat_name] -> :self
+        actual_food -> actual_food |> Enum.join(" ") |> String.replace(@cat_name, "")
+      end
+
+    add_to_feeder(feeder, food_to_add, who)
   end
 
   def handle_regular_message(_message, triggers, who, %{cat: cat}) do

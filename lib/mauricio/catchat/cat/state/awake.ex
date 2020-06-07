@@ -13,7 +13,7 @@ defmodule Mauricio.CatChat.Cat.State.Awake do
     %Awake{}
   end
 
-  def pet(_state, cat = %Cat{times_pet: times_pet}, who) do
+  def pet(_state, %Cat{times_pet: times_pet} = cat, who) do
     unmood = :random.uniform(times_pet + 1)
 
     if unmood > 5 do
