@@ -1,7 +1,6 @@
 defmodule Mauricio.CatChat.Chat.Interaction do
   require Logger
 
-  alias Nadia.Model.Message, as: NadiaMessage
   alias Nadia.Model.User, as: NadiaUser
 
   alias Mauricio.CatChat.{Member, Cat}
@@ -15,7 +14,7 @@ defmodule Mauricio.CatChat.Chat.Interaction do
   @cat_name "@kotyarabot"
 
   def process_message(
-    %NadiaMessage{text: text, from: %NadiaUser{id: user_id} = nadia_user} = message,
+    %{text: text, from: %NadiaUser{id: user_id} = nadia_user} = message,
     %{members: members} = state
   ) when not is_nil(text) do
     Logger.info("Message from user_id #{user_id} with text #{text}")
