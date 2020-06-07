@@ -81,9 +81,8 @@ defmodule Mauricio.CatChat.Cat.State do
 
   defp cat_dynamic(cat, karma_level, state) do
     cat
-    |> Cat.weight_dynamic
+    |> Cat.weight_dynamic()
     |> state_dynamic_message(karma_level, state)
-
   end
 
   defp cat_laziness(cat), do: Text.get_text([:laziness, cat.laziness])
