@@ -24,7 +24,7 @@ defmodule Mauricio.Poller do
   end
 
   def poll(offset \\ 0) do
-    process_messages(Nadia.get_updates([offset: offset]))
+    process_messages(Nadia.get_updates(offset: offset))
   end
 
   def process_messages({:ok, []}) do
@@ -42,5 +42,4 @@ defmodule Mauricio.Poller do
     CatChat.process_update(update, :async)
     update_id
   end
-
 end

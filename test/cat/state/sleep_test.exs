@@ -8,7 +8,7 @@ defmodule MauricioTest.Cat.State.Sleep do
   alias MauricioTest.Helpers
 
   setup do
-    %{member: Member.new("A", "B", 1, 1, true), cat: Cat.new("C", Sleep.new, 1, 1, 0)}
+    %{member: Member.new("A", "B", 1, 1, true), cat: Cat.new("C", Sleep.new(), 1, 1, 0)}
   end
 
   describe "pet" do
@@ -70,7 +70,7 @@ defmodule MauricioTest.Cat.State.Sleep do
       expected = Text.get_all_texts(key, who: member, cat: cat)
       {cat, nil, text} = Cat.tire(cat, member)
       assert Helpers.weak_text_eq(text, expected)
-      assert cat.state == Awake.new
+      assert cat.state == Awake.new()
       assert cat.energy == cat.weight
     end
   end

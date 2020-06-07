@@ -8,7 +8,7 @@ defmodule MauricioTest.Cat.State.WantCare do
   alias MauricioTest.Helpers
 
   setup do
-    %{member: Member.new("A", "B", 1, 1, true), cat: Cat.new("C", WantCare.new, 1, 1, 0)}
+    %{member: Member.new("A", "B", 1, 1, true), cat: Cat.new("C", WantCare.new(), 1, 1, 0)}
   end
 
   describe "pet" do

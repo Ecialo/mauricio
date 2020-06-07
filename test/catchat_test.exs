@@ -15,21 +15,43 @@ defmodule MauricioTest.CatChat do
   end
 
   test "create new chat then shutdown then again" do
-    :ok = CatChat.process_update(Helpers.start_update)
-    assert DynamicSupervisor.count_children(Chats) == %{active: 1, specs: 1, supervisors: 0, workers: 1}
+    :ok = CatChat.process_update(Helpers.start_update())
 
-    :ok = CatChat.process_update(Helpers.stop_update)
-    assert DynamicSupervisor.count_children(Chats) == %{active: 0, specs: 0, supervisors: 0, workers: 0}
+    assert DynamicSupervisor.count_children(Chats) == %{
+             active: 1,
+             specs: 1,
+             supervisors: 0,
+             workers: 1
+           }
 
-    :ok = CatChat.process_update(Helpers.start_update)
-    assert DynamicSupervisor.count_children(Chats) == %{active: 1, specs: 1, supervisors: 0, workers: 1}
+    :ok = CatChat.process_update(Helpers.stop_update())
 
-    :ok = CatChat.process_update(Helpers.stop_update)
-    assert DynamicSupervisor.count_children(Chats) == %{active: 0, specs: 0, supervisors: 0, workers: 0}
+    assert DynamicSupervisor.count_children(Chats) == %{
+             active: 0,
+             specs: 0,
+             supervisors: 0,
+             workers: 0
+           }
+
+    :ok = CatChat.process_update(Helpers.start_update())
+
+    assert DynamicSupervisor.count_children(Chats) == %{
+             active: 1,
+             specs: 1,
+             supervisors: 0,
+             workers: 1
+           }
+
+    :ok = CatChat.process_update(Helpers.stop_update())
+
+    assert DynamicSupervisor.count_children(Chats) == %{
+             active: 0,
+             specs: 0,
+             supervisors: 0,
+             workers: 0
+           }
   end
-
 end
-
 
 defmodule MauricioTest.CatChat.ResponseProcessing do
   use ExUnit.Case
@@ -71,16 +93,15 @@ defmodule MauricioTest.CatChat.ResponseProcessing do
 
     _st = fast_trigger.(:cat)
     Helpers.assert_capture_photo_or_animation()
-
   end
 
   test "process response from command" do
     state = Chat.new_state(1, Helpers.message_with_text(1, "1"), "Cat")
+
     %Cat{
       times_pet: times_pet,
       laziness: laziness
     } = state[:cat]
-
 
     message = fn text -> Helpers.message_with_text(1, text) end
 
@@ -99,7 +120,6 @@ defmodule MauricioTest.CatChat.ResponseProcessing do
     Helpers.assert_capture_expected_text(:any)
     assert st[:cat].laziness == round(laziness / 2)
   end
-
 end
 
 defmodule MauricioTest.CatChat.Interaction do
@@ -164,13 +184,14 @@ defmodule MauricioTest.CatChat.Interaction do
       Sapien id purus mattis, non hymenaeos rutrum neque sed, elementum amet odio egestas et non mauris.
       Eu sit at tortor commodo eu, dolor wisi in egestas suscipit non lorem, et turpis in, diam eget sit imperdiet pellentesque, proin dui sed orci.
       """
+
       {f, nil, _m} = Interaction.handle_command("/add_to_feeder" <> " " <> food_name, member, s)
       assert {:value, food_name} == :queue.peek(f)
     end
   end
 
   test "multiuser chat" do
-    :ok = CatChat.process_update(Helpers.start_update)
+    :ok = CatChat.process_update(Helpers.start_update())
     :ok = CatChat.process_update(Helpers.update_with_text(1, "Валера"))
 
     second_member_message = Helpers.update_with_text(1, 2, "123")
@@ -187,7 +208,6 @@ defmodule MauricioTest.CatChat.Interaction do
     assert state.members[1].participant?
     assert not state.members[2].participant?
 
-    :ok = CatChat.process_update(Helpers.stop_update)
+    :ok = CatChat.process_update(Helpers.stop_update())
   end
-
 end

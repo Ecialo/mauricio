@@ -8,7 +8,7 @@ defmodule MauricioTest.Cat.State.Away do
   alias MauricioTest.Helpers
 
   setup do
-    %{member: Member.new("A", "B", 1, 1, true), cat: Cat.new("C", Away.new, 1, 1, 0)}
+    %{member: Member.new("A", "B", 1, 1, true), cat: Cat.new("C", Away.new(), 1, 1, 0)}
   end
 
   describe "pet" do
@@ -38,6 +38,5 @@ defmodule MauricioTest.Cat.State.Away do
       assert Helpers.weak_text_eq(text, expected)
       assert cat.state == Awake.new()
     end
-
   end
 end

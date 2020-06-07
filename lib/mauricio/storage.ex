@@ -1,6 +1,7 @@
 defmodule Mauricio.Storage do
   use GenServer
   alias __MODULE__, as: Storage
+
   def init(_arg) do
     {:ok, %{}}
   end
@@ -21,7 +22,7 @@ defmodule Mauricio.Storage do
     {:reply, :ok, %{}}
   end
 
-  def handle_call({:pop, chat_id},_from, storage) do
+  def handle_call({:pop, chat_id}, _from, storage) do
     {_, ns} = Map.pop(storage, chat_id)
     {:reply, :ok, ns}
   end
@@ -54,5 +55,4 @@ defmodule Mauricio.Storage do
   def pop(chat_id) do
     GenServer.cast(Storage, {:pop, chat_id})
   end
-
 end

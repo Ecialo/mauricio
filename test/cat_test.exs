@@ -17,7 +17,7 @@ defmodule MauricioTest.CatTest do
 
     {cat, member, text} = Cat.pet(cat, member)
 
-    assert cat.state == Awake.new
+    assert cat.state == Awake.new()
     assert cat.times_pet == 1
     assert member.karma == 2
     assert text == expected_text
@@ -25,12 +25,13 @@ defmodule MauricioTest.CatTest do
 
   test "away pet" do
     member = Member.new("A", "B", 1, 1, True)
-    cat = Cat.new("C", Away.new, 1, 1, 0)
+    cat = Cat.new("C", Away.new(), 1, 1, 0)
     {cat, _member, text} = Cat.pet(cat, member)
 
     expected_text = """
     <i>A B хочет погладить котяру, но обнаруживает, что того нет дома.</i>
     """
+
     assert text == expected_text
     assert cat.times_pet == 0
   end
@@ -39,12 +40,14 @@ defmodule MauricioTest.CatTest do
     expected_text = """
     <i>One хочет погладить котяру, но обнаруживает, что того нет дома.</i>
     """
-    cat = Cat.new("Mau", Away.new, 1, 1, 0)
+
+    cat = Cat.new("Mau", Away.new(), 1, 1, 0)
+
     for member <- [
-      Member.new("One", nil, 1),
-      Member.new("One", nil, 1, 1, True),
-      Member.new(%NadiaUser{first_name: "One", last_name: nil, id: 1}),
-    ] do
+          Member.new("One", nil, 1),
+          Member.new("One", nil, 1, 1, True),
+          Member.new(%NadiaUser{first_name: "One", last_name: nil, id: 1})
+        ] do
       {_cat, _member, text} = Cat.pet(cat, member)
       assert text == expected_text
     end

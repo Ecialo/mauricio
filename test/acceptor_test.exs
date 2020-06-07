@@ -40,26 +40,40 @@ defmodule MauricioTest.Acceptor do
   end
 
   test "start-stop chat" do
-    url = "localhost:4001/#{Acceptor.tg_token}"
+    url = "localhost:4001/#{Acceptor.tg_token()}"
     assert {:ok, resp} = start_req(url)
     assert resp.status_code == 200
-    assert DynamicSupervisor.count_children(Chats) == %{active: 1, specs: 1, supervisors: 0, workers: 1}
 
-    assert {:ok, resp} = HTTPoison.post(
-      url,
-      File.read!("./test/test_data/hello_update.json"),
-      [{"content-type", "application/json"}]
-    )
+    assert DynamicSupervisor.count_children(Chats) == %{
+             active: 1,
+             specs: 1,
+             supervisors: 0,
+             workers: 1
+           }
+
+    assert {:ok, resp} =
+             HTTPoison.post(
+               url,
+               File.read!("./test/test_data/hello_update.json"),
+               [{"content-type", "application/json"}]
+             )
 
     assert {:ok, resp} = stop_req(url)
     assert resp.status_code == 200
-    assert DynamicSupervisor.count_children(Chats) == %{active: 0, specs: 0, supervisors: 0, workers: 0}
+
+    assert DynamicSupervisor.count_children(Chats) == %{
+             active: 0,
+             specs: 0,
+             supervisors: 0,
+             workers: 0
+           }
   end
 
   test "set webhook" do
-    Acceptor.set_webhook([host: "localhost", port: 4001])
+    Acceptor.set_webhook(host: "localhost", port: 4001)
     {:ok, request} = :bookish_spork.capture_request()
     {:ok, request} = :bookish_spork.capture_request()
+
     url =
       request
       |> Map.fetch!(:body)
@@ -68,13 +82,22 @@ defmodule MauricioTest.Acceptor do
 
     assert {:ok, resp} = start_req(url)
     assert resp.status_code == 200
-    assert DynamicSupervisor.count_children(Chats) == %{active: 1, specs: 1, supervisors: 0, workers: 1}
+
+    assert DynamicSupervisor.count_children(Chats) == %{
+             active: 1,
+             specs: 1,
+             supervisors: 0,
+             workers: 1
+           }
 
     assert {:ok, resp} = stop_req(url)
     assert resp.status_code == 200
-    assert DynamicSupervisor.count_children(Chats) == %{active: 0, specs: 0, supervisors: 0, workers: 0}
+
+    assert DynamicSupervisor.count_children(Chats) == %{
+             active: 0,
+             specs: 0,
+             supervisors: 0,
+             workers: 0
+           }
   end
-
-
-
 end
