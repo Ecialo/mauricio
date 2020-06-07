@@ -241,7 +241,6 @@ defmodule Mauricio.CatChat.Chat do
     name |> String.split() |> Enum.map(&String.capitalize/1) |> Enum.join(" ")
   end
 
-
   defimpl Mauricio.Storage.Serializable do
     alias Mauricio.Storage.Decoder
 
@@ -254,7 +253,5 @@ defmodule Mauricio.CatChat.Chat do
       |> Enum.map(fn {k, v} -> {Atom.to_string(k), @protocol.encode(v)} end)
       |> List.insert_at(0, Decoder.struct_field(struct_name))
     end
-
   end
-
 end

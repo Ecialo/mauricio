@@ -16,7 +16,6 @@ defmodule Mauricio.CatChat.Cat do
           reqs: 0..10
         }
 
-
   @derive [Serializable]
   defstruct name: nil,
             state: nil,
@@ -155,7 +154,6 @@ defmodule Mauricio.CatChat.Cat do
   end
 
   # React
-
   def react_to_triggers(cat = %Cat{state: state}, who, triggers) do
     CatState.react_to_triggers(state, cat, who, triggers)
   end

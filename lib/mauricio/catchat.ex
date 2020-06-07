@@ -28,9 +28,7 @@ defmodule Mauricio.CatChat.Chats do
     |> Enum.map(&elem(&1, 1))
     |> Enum.each(&GenServer.call(&1, :stop))
   end
-
 end
-
 
 defmodule Mauricio.CatChat.Supervisor do
   use Supervisor
@@ -42,16 +40,19 @@ defmodule Mauricio.CatChat.Supervisor do
   end
 
   def init(:ok) do
-    registry_name = Chat.registry_name
+    registry_name = Chat.registry_name()
+
     children = [
       {Registry, [keys: :unique, name: registry_name]},
       {Mauricio.CatChat.Chats, []}
     ]
+
     Supervisor.init(children, strategy: :one_for_all)
   end
 
   def get_chat(chat_id) do
-    registry = Chat.registry_name
+    registry = Chat.registry_name()
+
     case Registry.lookup(registry, chat_id) do
       [{pid, _}] -> pid
       [] -> nil
@@ -65,7 +66,6 @@ defmodule Mauricio.CatChat.Supervisor do
   def stop_chat(chat_pid) do
     CatChats.stop_chat(chat_pid)
   end
-
 end
 
 defmodule Mauricio.CatChat do
@@ -107,24 +107,35 @@ defmodule Mauricio.CatChat do
 
     chat_pid = CatSup.get_chat(chat_id)
     Logger.log(:info, "Chat pid #{inspect(chat_pid)}")
+
     case {chat_pid, text} do
-      {_, nil} -> :ok
-      {nil, @start_command<>_rest} ->
-        Logger.log(:info, "Start chat #{chat_id}")
+      {_, nil} ->
+        :ok
+
+      {nil, @start_command <> _rest} ->
+        Logger.log(:info, "Start chat #{chat_id} by command #{text}")
         CatSup.start_chat(chat_id)
         :ok
-      {_, @help_command<>_rest} ->
+
+      {_, @help_command <> _rest} ->
         Nadia.send_message(chat_id, Text.get_text(:help))
         :ok
-      {chat_pid, @stop_command<>_rest} when not is_nil(chat_pid) ->
-        Logger.log(:info, "Stop chat #{chat_id} with pid #{inspect(chat_pid)}")
+
+      {chat_pid, @stop_command <> _rest} when not is_nil(chat_pid) ->
+        Logger.log(:info, "Stop chat #{chat_id} with pid #{inspect(chat_pid)} by command #{text}")
         CatSup.stop_chat(chat_pid)
         :ok
-      {nil, _text} -> :ok
+
+      {nil, _text} ->
+        :ok
+
       {chat_pid, _text} ->
         Logger.log(:info, "Found #{chat_id} with pid #{inspect(chat_pid)}")
+
         case mode do
-          :sync -> chat_pid
+          :sync ->
+            chat_pid
+
           :async ->
             GenServer.cast(chat_pid, {:process_message, message})
             :ok
@@ -147,14 +158,17 @@ defmodule Mauricio.CatChat do
   end
 
   def process_update(update, mode \\ :sync)
+
   def process_update(update, :async),
     do: GenServer.cast(__MODULE__, {:process_update, update})
+
   def process_update(%{message: message} = update, :sync) do
     case GenServer.call(__MODULE__, {:process_update, update}) do
-      :ok -> :ok
+      :ok ->
+        :ok
+
       chat_pid ->
         GenServer.call(chat_pid, {:process_message, message})
     end
   end
-
 end

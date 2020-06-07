@@ -1,5 +1,4 @@
 defmodule PetAPI do
-
   @cat_url "https://api.thecatapi.com/v1/"
   @dog_url "https://api.thedogapi.com/v1/"
   @search "images/search"
@@ -30,7 +29,7 @@ defmodule PetAPI do
 
   def request(pet, method, url, body \\ "", headers \\ %{}, options \\ []) do
     headers = Map.put(headers, "x-api-key", token(pet))
-    HTTPoison.request(method, api_url(pet)<>url, body, headers, options)
+    HTTPoison.request(method, api_url(pet) <> url, body, headers, options)
   end
 
   def get_random_pet(pet) do
@@ -48,5 +47,4 @@ defmodule PetAPI do
     |> Map.fetch!(:url)
     |> match_url.()
   end
-
 end
