@@ -3,6 +3,9 @@ ExUnit.start()
 defmodule MauricioTest.Helpers do
   import ExUnit.Assertions
 
+  alias Nadia.Model.Update, as: NadiaUpdate
+  alias Nadia.Model.Message, as: NadiaMessage
+  alias Nadia.Model.Chat, as: NadiaChat
   alias Nadia.Model.User, as: NadiaUser
 
   alias Mauricio.CatChat.Chat
@@ -47,6 +50,9 @@ defmodule MauricioTest.Helpers do
       forward_from: nil,
       forward_from_chat: nil,
       from: user(user_id),
+      group_chat_created: nil,
+      left_chat_member: nil,
+      location: nil,
       message_id: 1030,
       migrate_from_chat_id: nil,
       migrate_to_chat_id: nil,
