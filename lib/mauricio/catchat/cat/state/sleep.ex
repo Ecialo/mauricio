@@ -7,6 +7,8 @@ defmodule Mauricio.CatChat.Cat.State.Sleep do
 
   defstruct []
 
+  @type t() :: %Sleep{}
+
   def new do
     %Sleep{}
   end

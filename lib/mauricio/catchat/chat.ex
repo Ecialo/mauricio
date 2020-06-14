@@ -7,6 +7,7 @@ defmodule Mauricio.CatChat.Chat do
   alias Mauricio.CatChat.Chat.{Interaction, Responses}
   alias Mauricio.Text
   alias Mauricio.Storage
+  alias Mauricio.Acceptor
 
   alias __MODULE__, as: Chat
 
@@ -99,7 +100,7 @@ defmodule Mauricio.CatChat.Chat do
     {:noreply, new_state}
   end
 
-  @spec process_message(map(), Chat.state()) :: Chat.state()
+  @spec process_message(Acceptor.unpacked_nadia_message(), Chat.state()) :: Chat.state()
   def process_message(message, state) when is_map(state) do
     responses = Interaction.process_message(message, state)
     new_state = Responses.process_responses(responses, state)

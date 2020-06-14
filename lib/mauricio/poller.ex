@@ -1,7 +1,9 @@
 defmodule Mauricio.Poller do
   use GenServer
   require Logger
-  alias Mauricio.CatChat
+
+  alias Nadia.Model.Update, as: NadiaUpdate
+  alias Mauricio.Acceptor
 
   def start_link(_arg) do
     Logger.log(:info, "Started poller")
@@ -37,9 +39,9 @@ defmodule Mauricio.Poller do
     |> List.last()
   end
 
-  def process_message(%{update_id: update_id} = update) do
+  def process_message(%NadiaUpdate{update_id: update_id} = update) do
     Logger.log(:info, inspect(update))
-    CatChat.process_update(update, :async)
+    Acceptor.call_process_update(update, :async)
     update_id
   end
 end
