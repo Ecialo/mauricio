@@ -14,6 +14,11 @@ defmodule Mauricio.Storage.MapStorage do
     GenServer.start_link(Storage, nil, name: name)
   end
 
+  @spec handle_get_all_ids(GenServer.from(), storage()) :: all_ids_reply()
+  def handle_get_all_ids(_from, storage) do
+    {:reply, Map.keys(storage), storage}
+  end
+
   @spec handle_fetch(Chat.chat_id(), GenServer.from(), storage()) :: fetch_reply()
   def handle_fetch(chat_id, _from, storage) do
     {:reply, Map.fetch(storage, chat_id), storage}
@@ -57,5 +62,5 @@ defmodule Mauricio.Storage.MapStorage do
     {:noreply, storage}
   end
 
-  defp from_self(), do: {self(), nil}
+  # defp from_self(), do: {self(), nil}
 end

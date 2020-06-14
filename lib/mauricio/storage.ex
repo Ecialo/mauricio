@@ -7,7 +7,9 @@ defmodule Mauricio.Storage do
   @type fetch_reply(s) :: {:reply, {:ok, Chat.t()} | :error, s}
   @type status_reply(s) :: {:reply, :ok | :error, s}
   @type noreply(s) :: {:noreply, s}
+  @type all_ids_reply(s) :: {:reply, [Chat.chat_id()], s}
 
+  @callback handle_get_all_ids(GenServer.from(), any()) :: all_ids_reply(any())
   @callback handle_fetch(Chat.chat_id(), GenServer.from(), any()) :: fetch_reply(any())
   @callback handle_put(Chat.t(), GenServer.from(), any()) :: status_reply(any())
   @callback handle_flush(GenServer.from(), any()) :: status_reply(any())
@@ -29,9 +31,14 @@ defmodule Mauricio.Storage do
 
       @behaviour Mauricio.Storage
 
+      @type all_ids_reply() :: BaseStorage.all_ids_reply(storage())
       @type fetch_reply() :: BaseStorage.fetch_reply(storage())
       @type status_reply() :: BaseStorage.status_reply(storage())
       @type noreply() :: BaseStorage.noreply(storage())
+
+      def handle_call(:get_all_ids, from, storage) do
+        handle_get_all_ids(from, storage)
+      end
 
       def handle_call({:fetch, chat_id}, from, storage) do
         handle_fetch(chat_id, from, storage)
@@ -86,7 +93,7 @@ defmodule Mauricio.Storage do
     end
   end
 
-  @spec put(Chat.t(), atom | pid | {atom, any} | {:via, atom, any}) :: :ok | :error
+  @spec put(Chat.t(), GenServer.server()) :: :ok | :error
   def put(chat, storage \\ Storage) do
     GenServer.call(storage, {:put, chat})
   end
@@ -95,7 +102,12 @@ defmodule Mauricio.Storage do
     GenServer.cast(storage, {:put, chat})
   end
 
-  @spec fetch(Chat.chat_id(), atom | pid | {atom, any} | {:via, atom, any}) :: {:ok, Chat.t()} | :error
+  @spec get_all_ids(GenServer.server()) :: [Chat.chat_id()]
+  def get_all_ids(storage \\ Storage) do
+    GenServer.call(storage, :get_all_ids)
+  end
+
+  @spec fetch(Chat.chat_id(), GenServer.server()) :: {:ok, Chat.t()} | :error
   def fetch(chat_id, storage \\ Storage) do
     GenServer.call(storage, {:fetch, chat_id})
   end

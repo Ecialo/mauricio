@@ -2,30 +2,50 @@ defmodule MauricioTest.CatChat do
   use ExUnit.Case
 
   alias Mauricio.CatChat
-  alias Mauricio.CatChat.{Chat, Chats}
-  alias Mauricio.CatChat.Cat
-  alias MauricioTest.Helpers
+  alias Mauricio.CatChat.{Chat, Chats, Cat}
   alias Mauricio.Text
+  alias Mauricio.Storage
+
+  alias MauricioTest.Helpers
+  alias MauricioTest.TestData
 
   setup do
     {:ok, _} = :bookish_spork.start_server()
     on_exit(&:bookish_spork.stop_server/0)
 
+    Chats.stop_all_chats()
+
     {:ok, %{}}
   end
 
+  def assert_currently_n_chats(n) do
+    assert DynamicSupervisor.count_children(Chats) == %{active: n, specs: n, supervisors: 0, workers: n}
+  end
+
   test "create new chat then shutdown then again" do
-    :ok = CatChat.process_update(Helpers.start_update)
-    assert DynamicSupervisor.count_children(Chats) == %{active: 1, specs: 1, supervisors: 0, workers: 1}
-
-    :ok = CatChat.process_update(Helpers.stop_update)
-    assert DynamicSupervisor.count_children(Chats) == %{active: 0, specs: 0, supervisors: 0, workers: 0}
+    assert_currently_n_chats(0)
 
     :ok = CatChat.process_update(Helpers.start_update)
-    assert DynamicSupervisor.count_children(Chats) == %{active: 1, specs: 1, supervisors: 0, workers: 1}
+    assert_currently_n_chats(1)
 
     :ok = CatChat.process_update(Helpers.stop_update)
-    assert DynamicSupervisor.count_children(Chats) == %{active: 0, specs: 0, supervisors: 0, workers: 0}
+    assert_currently_n_chats(0)
+
+    :ok = CatChat.process_update(Helpers.start_update)
+    assert_currently_n_chats(1)
+
+    :ok = CatChat.process_update(Helpers.stop_update)
+    assert_currently_n_chats(0)
+  end
+
+  test "start from stored state" do
+    chats = Enum.each(1..5, fn _ -> TestData.produce_some_chat() end)
+    assert_currently_n_chats(0)
+
+    Enum.each(chats, &Storage.put/1)
+
+    CatChat.handle_continue(:load_chats, nil)
+    assert_currently_n_chats(5)
   end
 
 end

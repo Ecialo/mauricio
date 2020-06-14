@@ -3,6 +3,7 @@ defmodule Mauricio.CatChat.Cat do
   alias Mauricio.CatChat.Cat.CatState
   alias Mauricio.CatChat.Cat.State.Awake
   alias Mauricio.Text
+  alias Mauricio.Storage.Serializable
 
   @type t() :: %Cat{
           name: String.t(),
@@ -15,6 +16,8 @@ defmodule Mauricio.CatChat.Cat do
           reqs: 0..10
         }
 
+
+  @derive [Serializable]
   defstruct name: nil,
             state: nil,
             weight: 5,

@@ -3,7 +3,9 @@ defmodule Mauricio.CatChat.Cat.State.Away do
   alias Mauricio.Text
   alias Mauricio.CatChat.Cat.{State, CatState}
   alias Mauricio.CatChat.Cat.State.Awake
+  alias Mauricio.Storage.Serializable
 
+  @derive [Serializable]
   defstruct []
 
   def new do

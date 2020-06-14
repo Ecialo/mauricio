@@ -1,5 +1,7 @@
 defmodule Mauricio.CatChat.Member do
   alias Nadia.Model.User, as: NadiaUser
+  alias Mauricio.Storage.Serializable
+
   alias __MODULE__, as: Member
 
   @type t() :: %Member{
@@ -9,6 +11,8 @@ defmodule Mauricio.CatChat.Member do
           karma: 0..10,
           participant?: boolean()
         }
+
+  @derive [Serializable]
   defstruct fname: nil, sname: nil, id: nil, karma: 3, participant?: true
 
   def new(fname, sname, id) do

@@ -1,5 +1,6 @@
 defmodule Mauricio.Storage.MongoStorage do
   use Mauricio.Storage
+  alias Mauricio.Storage.{Serializable, Decoder}
   alias __MODULE__, as: Storage
 
   @type storage() :: pid()
@@ -14,18 +15,27 @@ defmodule Mauricio.Storage.MongoStorage do
     GenServer.start_link(Storage, opts, name: name)
   end
 
+  @spec handle_get_all_ids(GenServer.from(), storage()) :: all_ids_reply()
+  def handle_get_all_ids(_from, storage) do
+    result =
+      Mongo.find(storage, @coll, %{}, projection: %{"chat_id" => 1, "_id" => 0})
+      |> Enum.map(&(&1["chat_id"]))
+    {:reply, result, storage}
+  end
+
   @spec handle_fetch(Chat.chat_id(), GenServer.from(), storage()) :: fetch_reply()
   def handle_fetch(chat_id, _from, storage) do
     chat = case Mongo.find_one(storage, @coll, %{_id: chat_id}) do
       nil -> :error
-      chat -> chat
+      chat -> {:ok, Decoder.decode(chat)}
     end
     {:reply, chat, storage}
   end
 
   @spec handle_put(Chat.t(), GenServer.from(), storage()) :: status_reply()
   def handle_put(chat, _from, storage) do
-    {:ok, _} = Mongo.insert_one(storage, @coll, encode_chat(chat), upsert: true)
+    s_chat = Serializable.encode(chat)
+    {:ok, _} = Mongo.insert_one(storage, @coll, s_chat, upsert: true)
     {:reply, :ok, storage}
   end
 
@@ -44,30 +54,5 @@ defmodule Mauricio.Storage.MongoStorage do
   @spec handle_save(Chat.chat_id(), GenServer.from(), storage()) :: status_reply()
   def handle_save(_chat_id, _from, storage) do
     {:reply, :ok, storage}
-  end
-
-  # @spec handle_put_async(Chat.t(), storage()) :: noreply()
-  # def handle_put_async(chat, storage) do
-  #   {:reply, :ok, state} = handle_put(chat, from_self(), storage)
-  #   {:noreply, state}
-  # end
-
-  # @spec handle_pop_async(Chat.chat_id(), storage()) :: noreply()
-  # def handle_pop_async(chat_id, storage) do
-  #   {:reply, :ok, ns} = handle_pop(chat_id, from_self(), storage)
-  #   {:noreply, ns}
-  # end
-
-  # @spec handle_save_async(Chat.chat_id(), storage()) :: noreply()
-  # def handle_save_async(_chat_id, storage) do
-  #   {:noreply, storage}
-  # end
-
-  # defp from_self(), do: {self(), nil}
-
-  @spec encode_chat(Chat.chat_id()) :: map()
-  defp encode_chat(chat) do
-    {chat_id, new_chat} = Map.pop(chat, :chat_id)
-    Map.put(new_chat, :_id, chat_id)
   end
 end

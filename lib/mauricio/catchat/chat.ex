@@ -12,7 +12,7 @@ defmodule Mauricio.CatChat.Chat do
   alias __MODULE__, as: Chat
 
   @type chat_id() :: integer
-  @type chat() :: %{
+  @type t() :: %Chat{
           members: %{optional(integer) => Member.t()},
           chat_id: chat_id,
           cat: Cat.t(),
@@ -22,7 +22,7 @@ defmodule Mauricio.CatChat.Chat do
   @type response_entity() :: :cat | :dog | String.t()
   @type response() :: response_entity | {response_entity, message_id}
   @type feeder() :: :queue.queue(String.t())
-  @type state() :: chat_id() | chat()
+  @type state() :: chat_id() | t()
   @type chat_update ::
           nil
           | {
@@ -33,11 +33,14 @@ defmodule Mauricio.CatChat.Chat do
 
   @catchat_registry Registry.CatChat
 
+  @enforce_keys [:chat_id, :cat]
+  defstruct members: %{}, chat_id: nil, cat: nil, feeder: :queue.new()
+
   defguard is_feeder(feeder)
            when is_tuple(feeder) and is_list(elem(feeder, 0)) and is_list(elem(feeder, 1))
 
   def new(chat_id, members, cat, feeder) do
-    %{members: members, chat_id: chat_id, cat: cat, feeder: feeder}
+    %Chat{members: members, chat_id: chat_id, cat: cat, feeder: feeder}
   end
 
   # Client
@@ -71,10 +74,12 @@ defmodule Mauricio.CatChat.Chat do
 
     case Storage.fetch(chat_id) do
       {:ok, chat} ->
+        Logger.log(:info, "Chat for chat_id #{chat_id} found")
         schedule(chat, :all)
         {:noreply, chat}
 
       :error ->
+        Logger.log(:info, "Chat for chat_id #{chat_id} not found")
         send_message(chat_id, Text.get_text(:start))
         {:noreply, chat_id}
     end
@@ -206,12 +211,6 @@ defmodule Mauricio.CatChat.Chat do
     }
 
     new(chat_id, members, cat, :queue.new())
-    # %{
-    #   members: members,
-    #   cat: cat,
-    #   chat_id: chat_id,
-    #   feeder: :queue.new()
-    # }
   end
 
   def get_name(chat_id) do
@@ -241,4 +240,21 @@ defmodule Mauricio.CatChat.Chat do
   defp capitalize_cat_name(name) do
     name |> String.split() |> Enum.map(&String.capitalize/1) |> Enum.join(" ")
   end
+
+
+  defimpl Mauricio.Storage.Serializable do
+    alias Mauricio.Storage.Decoder
+
+    def encode(chat = %Chat{chat_id: chat_id}) do
+      struct_name = Atom.to_string(chat.__struct__)
+
+      chat
+      |> Map.from_struct()
+      |> Map.put(:_id, chat_id)
+      |> Enum.map(fn {k, v} -> {Atom.to_string(k), @protocol.encode(v)} end)
+      |> List.insert_at(0, Decoder.struct_field(struct_name))
+    end
+
+  end
+
 end

@@ -83,13 +83,7 @@ defmodule MauricioTest.TestData.Member do
 
   def some_members do
     let size <- integer(1, 10) do
-      ids_list =
-        such_that(
-          ids <- vector(size, integer()),
-          when: Enum.count(ids) == ids |> Enum.uniq() |> Enum.count()
-        )
-
-      let il <- ids_list do
+      let il <- vector(size, integer()) do
         Enum.map(il, &that_member/1)
       end
     end
@@ -118,4 +112,10 @@ defmodule MauricioTest.TestData do
       Chat.new(chat_id, members, cat, feeder)
     end
   end
+
+  def produce_some_chat do
+    {:ok, some_chat} = some_chat() |> PropCheck.produce()
+    some_chat
+  end
+
 end

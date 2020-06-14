@@ -4,9 +4,11 @@ defmodule Mauricio.CatChat.Cat.State.WantCare do
   alias Mauricio.CatChat.{Cat, Member}
   alias Mauricio.CatChat.Cat.{State, CatState}
   alias Mauricio.CatChat.Cat.State.Awake
+  alias Mauricio.Storage.Serializable
 
   @type t() :: %WantCare{times_not_pet: non_neg_integer}
 
+  @derive [Serializable]
   defstruct times_not_pet: 0
 
   def new do

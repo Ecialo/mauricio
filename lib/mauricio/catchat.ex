@@ -1,10 +1,13 @@
 defmodule Mauricio.CatChat.Chats do
   use DynamicSupervisor
+
   require Logger
+
   alias Mauricio.CatChat.Chat
+  alias __MODULE__, as: Chats
 
   def start_link(_arg) do
-    DynamicSupervisor.start_link(__MODULE__, :ok, name: __MODULE__)
+    DynamicSupervisor.start_link(Chats, :ok, name: Chats)
   end
 
   def init(:ok) do
@@ -13,11 +16,17 @@ defmodule Mauricio.CatChat.Chats do
 
   def start_chat(chat_id) do
     spec = Chat.child_spec(chat_id)
-    DynamicSupervisor.start_child(__MODULE__, spec)
+    DynamicSupervisor.start_child(Chats, spec)
   end
 
   def stop_chat(chat_pid) do
     GenServer.call(chat_pid, :stop)
+  end
+
+  def stop_all_chats() do
+    DynamicSupervisor.which_children(Chats)
+    |> Enum.map(&elem(&1, 1))
+    |> Enum.each(&GenServer.call(&1, :stop))
   end
 
 end
@@ -64,11 +73,13 @@ defmodule Mauricio.CatChat do
 
   require Logger
 
-  alias Mauricio.CatChat.Supervisor, as: CatSup
-  alias Mauricio.Text
   alias Nadia.Model.Update, as: NadiaUpdate
   alias Nadia.Model.Message, as: NadiaMessage
   alias Nadia.Model.Chat, as: NadiaChat
+
+  alias Mauricio.CatChat.Supervisor, as: CatSup
+  alias Mauricio.Text
+  alias Mauricio.Storage
 
   @start_command "/start"
   @stop_command "/stop"
@@ -79,28 +90,37 @@ defmodule Mauricio.CatChat do
   end
 
   def init(:ok) do
-    CatSup.start_link()
+    {:ok, pid} = CatSup.start_link()
+
+    {:ok, pid, {:continue, :load_chats}}
+  end
+
+  def handle_continue(:load_chats, catsup_pid) do
+    Storage.get_all_ids()
+    |> Enum.each(&CatSup.start_chat/1)
+
+    {:noreply, catsup_pid}
   end
 
   def handle_update(%NadiaUpdate{message: message}, mode) when not is_nil(message) do
     %NadiaMessage{chat: chat, text: text} = message
     %NadiaChat{id: chat_id} = chat
 
-    Logger.log(:info, "Message from #{chat_id} with text #{text}")
+    Logger.log(:info, "Message from #{chat_id}")
 
     chat_pid = CatSup.get_chat(chat_id)
     Logger.log(:info, "Chat pid #{inspect(chat_pid)}")
     case {chat_pid, text} do
       {_, nil} -> :ok
       {nil, @start_command<>_rest} ->
-        Logger.log(:info, "Start chat #{chat_id} by command #{text}")
+        Logger.log(:info, "Start chat #{chat_id}")
         CatSup.start_chat(chat_id)
         :ok
       {_, @help_command<>_rest} ->
         Nadia.send_message(chat_id, Text.get_text(:help))
         :ok
       {chat_pid, @stop_command<>_rest} when not is_nil(chat_pid) ->
-        Logger.log(:info, "Stop chat #{chat_id} with pid #{inspect(chat_pid)} by command #{text}")
+        Logger.log(:info, "Stop chat #{chat_id} with pid #{inspect(chat_pid)}")
         CatSup.stop_chat(chat_pid)
         :ok
       {nil, _text} -> :ok
