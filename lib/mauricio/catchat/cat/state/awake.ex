@@ -85,7 +85,7 @@ defmodule Mauricio.CatChat.Cat.State.Awake do
     defdelegate eat(state, cat, who), to: Awake
     defdelegate tire(state, cat, who), to: Awake
     def pine(%Awake{}, cat = %Cat{times_pet: times_pet}, who) when times_pet >= 4,
-      do: {%{cat | state: Away.new}, who, Text.get_text(:going_out, cat: cat, who: who)}
+      do: {%{cat | state: Away.new, times_pet: 0}, who, Text.get_text(:going_out, cat: cat, who: who)}
     def pine(%Awake{}, cat, who),
       do: {%{cat | state: WantCare.new}, who, Text.get_text(:want_care, cat: cat, who: who)}
     defdelegate metabolic(state, cat, who), to: Awake

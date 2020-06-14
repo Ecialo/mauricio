@@ -61,7 +61,8 @@ defmodule Mauricio.MixProject do
       {:dialyxir, "~> 1.0.0-rc.7", only: :dev, runtime: false},
       {:rename, "~> 0.1.0", only: :dev},
       {:excoveralls, "~> 0.12.3", only: :test},
-      {:propcheck, "~> 1.1", only: [:test, :dev]}
+      {:propcheck, "~> 1.1", only: [:test, :dev]},
+      {:ex_doc, "~> 0.21.3", dev: true, runtime: false}
     ]
   end
 end
