@@ -118,4 +118,12 @@ defmodule MauricioTest.TestData do
     some_chat
   end
 
+  def produce_n_uniq_chats(n) do
+    produce_some_chat()
+    |> Stream.iterate(fn _ -> produce_some_chat() end)
+    |> Stream.uniq_by(&(&1.chat_id))
+    |> Stream.take(n)
+    |> Enum.to_list()
+  end
+
 end

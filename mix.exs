@@ -10,8 +10,6 @@ defmodule Mauricio.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       test_coverage: [tool: ExCoveralls],
-      # propcheck: [counter_examples: "_build/propcheck.ctx"],
-      # propcheck: [counter_examples: "test/counter"]
     ]
   end
 
@@ -23,8 +21,8 @@ defmodule Mauricio.MixProject do
         :logger,
         :runtime_tools,
         :eex
-      ]
-      # mod: {Mauricio, []},
+      ],
+      mod: {Mauricio, []},
       # start_phases: [setup_webhook: []]
     ]
   end

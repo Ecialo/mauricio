@@ -14,6 +14,7 @@ defmodule MauricioTest.CatChat do
     on_exit(&:bookish_spork.stop_server/0)
 
     Chats.stop_all_chats()
+    Storage.flush()
 
     {:ok, %{}}
   end
@@ -39,7 +40,7 @@ defmodule MauricioTest.CatChat do
   end
 
   test "start from stored state" do
-    chats = Enum.each(1..5, fn _ -> TestData.produce_some_chat() end)
+    chats = TestData.produce_n_uniq_chats(5)
     assert_currently_n_chats(0)
 
     Enum.each(chats, &Storage.put/1)
@@ -55,13 +56,17 @@ defmodule MauricioTest.CatChat.ResponseProcessing do
   use ExUnit.Case
 
   alias Mauricio.Text
-  alias Mauricio.CatChat.{Cat, Chat}
+  alias Mauricio.CatChat.{Cat, Chat, Chats}
   alias Mauricio.CatChat.Chat.Responses
+
   alias MauricioTest.Helpers
 
   setup do
     {:ok, _} = :bookish_spork.start_server()
     on_exit(&:bookish_spork.stop_server/0)
+
+    Chats.stop_all_chats()
+    Storage.flush()
 
     {:ok, %{}}
   end
@@ -127,14 +132,17 @@ defmodule MauricioTest.CatChat.Interaction do
 
   alias Mauricio.Storage
   alias Mauricio.CatChat
-  alias Mauricio.CatChat.{Cat, Member}
+  alias Mauricio.CatChat.{Cat, Member, Chats}
   alias Mauricio.CatChat.Chat.Interaction
+
   alias MauricioTest.Helpers
 
   setup do
     {:ok, _} = :bookish_spork.start_server()
     on_exit(&:bookish_spork.stop_server/0)
-    on_exit(&Storage.flush/0)
+
+    Chats.stop_all_chats()
+    Storage.flush()
 
     {:ok, %{}}
   end

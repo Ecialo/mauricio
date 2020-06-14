@@ -11,7 +11,7 @@ defmodule Mauricio.Storage.MongoStorage do
   end
 
   def start_link(opts \\ [], name \\ nil) do
-    name = name || Storage
+    name = name || BaseStorage.name()
     GenServer.start_link(Storage, opts, name: name)
   end
 
@@ -35,7 +35,7 @@ defmodule Mauricio.Storage.MongoStorage do
   @spec handle_put(Chat.t(), GenServer.from(), storage()) :: status_reply()
   def handle_put(chat, _from, storage) do
     s_chat = Serializable.encode(chat)
-    {:ok, _} = Mongo.insert_one(storage, @coll, s_chat, upsert: true)
+    {:ok, _} = Mongo.replace_one(storage, @coll, %{"_id" => chat.chat_id}, s_chat, upsert: true)
     {:reply, :ok, storage}
   end
 
