@@ -8,6 +8,8 @@ jobs:
     services:
       mongodb:
         image: mongo
+        ports:
+        - 27017/tcp
     steps:
     - uses: actions/checkout@v2
     - name: Create config/secret.exs
@@ -32,8 +34,8 @@ jobs:
       run: mix coveralls.json
       env:
         MIX_ENV: test
-        MONGODB_HOST: mongodb
-        MONGODB_PORT: 27017
+        MONGODB_HOST: localhost
+        MONGODB_PORT: ${{ job.services.mongodb.ports[27017] }}
     - name: Upload coverage results
       run: bash <(curl -s https://codecov.io/bash)
 
