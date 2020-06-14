@@ -5,3 +5,4 @@ config :nadia,
 
 config :mauricio,
   storage: [type: :mongo, url: "mongodb://localhost:27017/db-name"]
+  storage: [type: :mongo, url: "mongodb://" <> System.get_env("MONGODB_HOST") <> ":" <> System.get_env("MONGODB_PORT") <> "/db-name"]
