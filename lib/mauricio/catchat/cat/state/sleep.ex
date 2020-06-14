@@ -9,6 +9,8 @@ defmodule Mauricio.CatChat.Cat.State.Sleep do
   @derive [Serializable]
   defstruct []
 
+  @type t() :: %Sleep{}
+
   def new do
     %Sleep{}
   end
