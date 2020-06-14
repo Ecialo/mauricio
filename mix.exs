@@ -6,23 +6,29 @@ defmodule Mauricio.MixProject do
       app: :mauricio,
       version: "0.2.0",
       elixir: "~> 1.10",
-      elixirc_paths: elixirc_paths(Mix.env),
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ],
+      test_coverage: [tool: ExCoveralls]
     ]
   end
 
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      applications: applications(Mix.env),
+      applications: applications(Mix.env()),
       extra_applications: [
         :logger,
         :runtime_tools,
         :eex
       ],
-      mod: {Mauricio, []},
+      mod: {Mauricio, []}
       # start_phases: [setup_webhook: []]
     ]
   end
@@ -36,10 +42,9 @@ defmodule Mauricio.MixProject do
       :nadia,
       :mongodb_driver,
       :elli,
-      :jason,
+      :jason
     ]
   end
-
 
   defp elixirc_paths(:test), do: ["lib", "test/test_data"]
   defp elixirc_paths(_), do: ["lib"]

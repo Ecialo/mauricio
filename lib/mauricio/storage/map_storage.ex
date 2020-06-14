@@ -1,5 +1,6 @@
 defmodule Mauricio.Storage.MapStorage do
   use Mauricio.Storage
+
   alias __MODULE__, as: Storage
   alias Mauricio.CatChat.Chat
 
@@ -10,7 +11,7 @@ defmodule Mauricio.Storage.MapStorage do
   end
 
   def start_link(arg \\ nil) do
-    name = arg || Storage
+    name = arg || BaseStorage.name()
     GenServer.start_link(Storage, nil, name: name)
   end
 
@@ -45,22 +46,4 @@ defmodule Mauricio.Storage.MapStorage do
     {:reply, :ok, storage}
   end
 
-  @spec handle_put_async(Chat.t(), storage()) :: noreply()
-  def handle_put_async(chat, storage) do
-    {:reply, :ok, state} = handle_put(chat, from_self(), storage)
-    {:noreply, state}
-  end
-
-  @spec handle_pop_async(Chat.chat_id(), storage()) :: noreply()
-  def handle_pop_async(chat_id, storage) do
-    {:reply, :ok, ns} = handle_pop(chat_id, from_self(), storage)
-    {:noreply, ns}
-  end
-
-  @spec handle_save_async(Chat.chat_id(), storage()) :: noreply()
-  def handle_save_async(_chat_id, storage) do
-    {:noreply, storage}
-  end
-
-  # defp from_self(), do: {self(), nil}
 end

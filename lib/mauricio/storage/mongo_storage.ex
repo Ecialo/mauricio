@@ -19,16 +19,19 @@ defmodule Mauricio.Storage.MongoStorage do
   def handle_get_all_ids(_from, storage) do
     result =
       Mongo.find(storage, @coll, %{}, projection: %{"chat_id" => 1, "_id" => 0})
-      |> Enum.map(&(&1["chat_id"]))
+      |> Enum.map(& &1["chat_id"])
+
     {:reply, result, storage}
   end
 
   @spec handle_fetch(Chat.chat_id(), GenServer.from(), storage()) :: fetch_reply()
   def handle_fetch(chat_id, _from, storage) do
-    chat = case Mongo.find_one(storage, @coll, %{_id: chat_id}) do
-      nil -> :error
-      chat -> {:ok, Decoder.decode(chat)}
-    end
+    chat =
+      case Mongo.find_one(storage, @coll, %{_id: chat_id}) do
+        nil -> :error
+        chat -> {:ok, Decoder.decode(chat)}
+      end
+
     {:reply, chat, storage}
   end
 

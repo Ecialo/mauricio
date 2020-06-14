@@ -1,7 +1,6 @@
 defmodule Mauricio do
   use Application
 
-  alias Mauricio.Storage
   alias Mauricio.Storage.{MongoStorage, MapStorage}
 
   def select_update_provider(provider_type) do
@@ -12,9 +11,9 @@ defmodule Mauricio do
     end
   end
 
-
   def select_storage(storage_opts) do
     {storage_type, opts} = Keyword.pop(storage_opts, :type)
+
     case storage_type do
       :mongo -> [{MongoStorage, opts}]
       :map -> [{MapStorage, opts}]
@@ -32,11 +31,13 @@ defmodule Mauricio do
       |> select_storage()
 
     cat_chat = [{Mauricio.CatChat, []}]
-    children = Enum.concat([
-      storage,
-      cat_chat,
-      update_provider,
-    ])
+
+    children =
+      Enum.concat([
+        storage,
+        cat_chat,
+        update_provider
+      ])
 
     Supervisor.start_link(children, strategy: :one_for_one)
   end

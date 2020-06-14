@@ -6,16 +6,6 @@ defmodule MauricioTest.Storage.MongoStorage do
   alias Mauricio.Storage.MongoStorage
   alias MauricioTest.TestData
 
-  # setup_all do
-  #   {:ok, pid} =
-  #     MongoStorage.start_link(
-  #       [url: "mongodb://localhost:27017/db-name"],
-  #       Storage.name()
-  #     )
-
-  #   %{storage_pid: pid}
-  # end
-
   setup do
     Storage.flush()
   end
@@ -77,6 +67,5 @@ defmodule MauricioTest.Storage.MongoStorage do
     {:ok, fetched_chat} = Storage.fetch(chat_id)
 
     assert fetched_chat == new_old_chat
-
   end
 end

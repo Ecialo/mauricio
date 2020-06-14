@@ -1,25 +1,13 @@
 defmodule MauricioTest.Storage do
   use ExUnit.Case
 
-  alias Mauricio.Storage
-  alias Mauricio.CatChat
+  alias Mauricio.{Storage, CatChat}
   alias MauricioTest.Helpers
 
   setup do
     {:ok, _} = :bookish_spork.start_server()
     on_exit(&:bookish_spork.stop_server/0)
-    on_exit(&Storage.flush/0)
-  end
-
-  test "put get" do
-    v = %{chat_id: 1, val: 2}
-    :ok = Storage.put(v)
-    {:ok, vv} = Storage.fetch(1)
-    assert v == vv
-  end
-
-  test "get" do
-    assert :error == Storage.fetch(1)
+    Storage.flush()
   end
 
   test "preserve chats" do

@@ -55,7 +55,7 @@ end
 defmodule MauricioTest.CatChat.ResponseProcessing do
   use ExUnit.Case
 
-  alias Mauricio.Text
+  alias Mauricio.{Text, Storage}
   alias Mauricio.CatChat.{Cat, Chat, Chats}
   alias Mauricio.CatChat.Chat.Responses
 
@@ -73,8 +73,8 @@ defmodule MauricioTest.CatChat.ResponseProcessing do
 
   test "process response from cat reation" do
     chat_state = Chat.new_state(1, Helpers.message_with_text(1, "1"), "Cat")
-    who = chat_state[:members][1]
-    cat = chat_state[:cat]
+    who = chat_state.members[1]
+    cat = chat_state.cat
     cat_satiety = cat.satiety
 
     fast_trigger = fn trigger ->
@@ -85,11 +85,11 @@ defmodule MauricioTest.CatChat.ResponseProcessing do
 
     st = fast_trigger.(:banish)
     Helpers.assert_capture_expected_text(Text.get_text(:banished, cat: cat, who: who))
-    assert st[:members][who.id].participant? == false
+    assert st.members[who.id].participant? == false
 
     st = fast_trigger.(:eat)
     Helpers.assert_capture_expected_text(:any)
-    assert st[:cat].satiety == cat_satiety + 1
+    assert st.cat.satiety == cat_satiety + 1
 
     _st = fast_trigger.(:mew)
     Helpers.assert_capture_expected_text(:any)
@@ -104,7 +104,7 @@ defmodule MauricioTest.CatChat.ResponseProcessing do
     %Cat{
       times_pet: times_pet,
       laziness: laziness
-    } = state[:cat]
+    } = state.cat
 
 
     message = fn text -> Helpers.message_with_text(1, text) end
@@ -114,15 +114,15 @@ defmodule MauricioTest.CatChat.ResponseProcessing do
 
     st = Chat.process_message(message.("/pet"), state)
     Helpers.assert_capture_expected_text(:any)
-    assert st[:cat].times_pet == times_pet + 1
+    assert st.cat.times_pet == times_pet + 1
 
     st = Chat.process_message(message.("/become_lazy"), state)
     Helpers.assert_capture_expected_text(:any)
-    assert st[:cat].laziness == laziness * 2
+    assert st.cat.laziness == laziness * 2
 
     st = Chat.process_message(message.("/become_annoying"), state)
     Helpers.assert_capture_expected_text(:any)
-    assert st[:cat].laziness == round(laziness / 2)
+    assert st.cat.laziness == round(laziness / 2)
   end
 
 end
@@ -130,8 +130,7 @@ end
 defmodule MauricioTest.CatChat.Interaction do
   use ExUnit.Case
 
-  alias Mauricio.Storage
-  alias Mauricio.CatChat
+  alias Mauricio.{Storage, CatChat}
   alias Mauricio.CatChat.{Cat, Member, Chats}
   alias Mauricio.CatChat.Chat.Interaction
 
