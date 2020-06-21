@@ -28,8 +28,8 @@ defmodule Mauricio.MixProject do
         :runtime_tools,
         :eex
       ],
-      mod: {Mauricio, []}
-      # start_phases: [setup_webhook: []]
+      mod: {Mauricio, []},
+      start_phases: [setup_webhook: []]
     ]
   end
 

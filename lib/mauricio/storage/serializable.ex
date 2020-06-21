@@ -1,6 +1,6 @@
 defprotocol Mauricio.Storage.Serializable do
   @moduledoc """
-  How to simplify data to fromats allowed by mongodb. Shipped with this:
+  How to simplify data to formats allowed by mongodb. Shipped with this:
 
       iex> Mauricio.Storage.Serializable.encode(1)
       1

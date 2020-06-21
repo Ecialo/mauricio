@@ -10,11 +10,13 @@ defmodule Mauricio.Storage.MongoStorage do
     Mongo.start_link(opts)
   end
 
-  def start_link(opts \\ [], name \\ nil) do
+  def start_link(opts \\ []) do
+    {name, opts} = Keyword.pop(opts, :name)
+
     name = name || BaseStorage.name()
     GenServer.start_link(Storage, opts, name: name)
   end
-
+  
   @spec handle_get_all_ids(GenServer.from(), storage()) :: all_ids_reply()
   def handle_get_all_ids(_from, storage) do
     result =

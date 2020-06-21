@@ -11,13 +11,15 @@ defmodule Mauricio do
     end
   end
 
+  def select_storage(nil), do: [{MapStorage, nil}]
+
   def select_storage(storage_opts) do
     {storage_type, opts} = Keyword.pop(storage_opts, :type)
 
     case storage_type do
       :mongo -> [{MongoStorage, opts}]
       :map -> [{MapStorage, opts}]
-      nil -> [{MapStorage, []}]
+      nil -> [{MapStorage, nil}]
     end
   end
 

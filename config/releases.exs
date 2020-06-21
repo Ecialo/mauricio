@@ -7,5 +7,5 @@ config :mauricio,
   dog_api_token: System.get_env("DOG_API_TOKEN"),
   storage: [
     type: :mongo,
-    url: "mongodb://localhost:27017/db-name"
+    url: System.get_env("MONGO_URL")
   ]
