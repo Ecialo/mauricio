@@ -34,7 +34,8 @@ defmodule Mauricio.MixProject do
       {:rename, "~> 0.1.0", only: :dev},
       {:excoveralls, "~> 0.12.3", only: :test},
       {:ex_doc, "~> 0.21.3", dev: true, runtime: false},
-      {:credo, "~> 1.4.0", only: :dev, runtime: false}
+      {:credo, "~> 1.4.0", only: :dev, runtime: false},
+      {:benchee, "~> 1.0.1", only: :dev}
     ]
   end
 end
