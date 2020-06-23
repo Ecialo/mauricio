@@ -63,19 +63,21 @@ defmodule Mauricio.CatChat.Chat.Interaction do
     new_food_message = Text.get_text(:food_to_feeder, who: who, new_food: food)
     feeder = :queue.in(food, feeder)
     feeder_size = :queue.len(feeder)
-    feeder_content_message = Text.get_text(:feeder_content, all_food: :queue.to_list(feeder))
 
     if feeder_size > 5 do
       {{:value, old_food}, feeder} = :queue.out(feeder)
       overflow_message = Text.get_text(:feeder_overflow, old_food: old_food)
-
-      result_message =
-        Enum.join([new_food_message, "", overflow_message, "", feeder_content_message], "\n")
+      result_message = 
+        Enum.join([new_food_message, "", overflow_message, "", feeder_content_message(feeder)], "\n")
 
       {feeder, nil, result_message}
     else
-      {feeder, nil, Enum.join([new_food_message, "", feeder_content_message], "\n")}
+      {feeder, nil, Enum.join([new_food_message, "", feeder_content_message(feeder)], "\n")}
     end
+  end
+
+  defp feeder_content_message(feeder) do
+    Text.get_text(:feeder_content, all_food: :queue.to_list(feeder))
   end
 
   def handle_command(
