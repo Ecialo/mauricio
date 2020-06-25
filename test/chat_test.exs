@@ -1,11 +1,14 @@
 defmodule MauricioTest.Chat do
   use ExUnit.Case
+  use PropCheck
 
   alias Mauricio.CatChat.{Chat, Cat}
   alias Mauricio.CatChat.Cat.State.{Sleep, WantCare}
-  alias MauricioTest.Helpers
   alias Mauricio.Text
   alias Mauricio.Storage
+  alias Mauricio.Storage.{Serializable, Decoder}
+
+  alias MauricioTest.{Helpers, TestData}
 
   setup do
     {:ok, _} = :bookish_spork.start_server()
@@ -90,6 +93,15 @@ defmodule MauricioTest.Chat do
       assert_receive signal
     end
     Storage.pop(1)
+  end
+
+  property "serialization preserve equality after encode-decode" do
+    forall chat <- TestData.some_chat(), [:verbose] do
+      chat ==
+        chat
+        |> Serializable.encode()
+        |> Decoder.decode()
+    end
   end
 
 end

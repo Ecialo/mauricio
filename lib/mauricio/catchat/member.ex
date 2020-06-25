@@ -1,15 +1,19 @@
 defmodule Mauricio.CatChat.Member do
   alias Nadia.Model.User, as: NadiaUser
+  alias Mauricio.Storage.Serializable
+
   alias __MODULE__, as: Member
 
   @type t() :: %Member{
-    fname: String.t,
-    sname: String.t,
-    id: integer,
-    karma: non_neg_integer,
-    participant?: boolean
-  }
-  defstruct [fname: nil, sname: nil, id: nil, karma: 3, participant?: true]
+          fname: String.t(),
+          sname: String.t(),
+          id: integer(),
+          karma: 0..10,
+          participant?: boolean()
+        }
+
+  @derive [Serializable]
+  defstruct fname: nil, sname: nil, id: nil, karma: 3, participant?: true
 
   def new(fname, sname, id) do
     %Member{fname: fname, sname: sname, id: id}
@@ -25,10 +29,12 @@ defmodule Mauricio.CatChat.Member do
 
   @spec change_karma(Member.t(), :inc | :dec) :: Member.t()
   def change_karma(member = %Member{karma: karma}, direction) do
-    new_karma = case direction do
-      :inc -> min(karma + 1, Application.get_env(:mauricio, :max_karma))
-      :dec -> max(karma - 1, 0)
-    end
+    new_karma =
+      case direction do
+        :inc -> min(karma + 1, Application.get_env(:mauricio, :max_karma))
+        :dec -> max(karma - 1, 0)
+      end
+
     %{member | karma: new_karma}
   end
 
@@ -48,6 +54,12 @@ defmodule Mauricio.CatChat.Member do
   @doc """
   Call a user by their full name.
   Telegram guarantees that the first name is never empty, which may be not true for the last one.
+
+    iex> Mauricio.CatChat.Member.full_name(Member.new("Ivan", "Ivanov", 1))
+    "Ivan Ivanov"
+
+    iex> Mauricio.CatChat.Member.full_name(Member.new("Ivan", nil, 1))
+    "Ivan"
   """
   def full_name(%Member{fname: fname, sname: sname}) when is_nil(sname), do: fname
   def full_name(%Member{fname: fname, sname: sname}), do: fname <> " " <> sname

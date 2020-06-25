@@ -7,6 +7,7 @@ defmodule MauricioTest.Acceptor do
   setup_all do
     children = [{Mauricio.Acceptor, [port: 4001]}]
     assert {:ok, _server_pid} = Supervisor.start_link(children, strategy: :one_for_one)
+    Chats.stop_all_chats()
     :ok
   end
 

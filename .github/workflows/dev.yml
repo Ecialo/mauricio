@@ -1,16 +1,15 @@
 name: dev
 
-on:
-  push:
-    branches:
-    - master
-  pull_request:
-    branches:
-    - master
+on: [push, pull_request]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      mongodb:
+        image: mongo
+        ports:
+        - 27017/tcp
     steps:
     - uses: actions/checkout@v2
     - name: Create config/secret.exs
@@ -32,7 +31,11 @@ jobs:
     - name: Install Dependencies
       run: mix deps.get
     - name: Run test (and create coverage report)
-      run: MIX_ENV=test mix coveralls.json
+      run: mix coveralls.json
+      env:
+        MIX_ENV: test
+        MONGODB_HOST: localhost
+        MONGODB_PORT: ${{ job.services.mongodb.ports[27017] }}
     - name: Upload coverage results
       run: bash <(curl -s https://codecov.io/bash)
 

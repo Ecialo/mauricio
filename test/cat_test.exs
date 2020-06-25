@@ -1,10 +1,14 @@
 defmodule MauricioTest.CatTest do
   use ExUnit.Case
+  use PropCheck
 
-  alias Mauricio.CatChat.Cat
-  alias Mauricio.CatChat.Member
-  alias Mauricio.CatChat.Cat.State.{Awake, Away, WantCare}
   alias Nadia.Model.User, as: NadiaUser
+
+  alias Mauricio.CatChat.{Cat, Member}
+  alias Mauricio.CatChat.Cat.State.{Awake, Away, WantCare}
+  alias Mauricio.Storage.{Serializable, Decoder}
+
+  alias MauricioTest.TestData.Cat, as: TestCat
 
   test "joyful pet" do
     member = Member.new("A", "B", 1, 1, True)
@@ -33,6 +37,15 @@ defmodule MauricioTest.CatTest do
     """
     assert text == expected_text
     assert cat.times_pet == 0
+  end
+
+  property "serialization preserve equality after encode-decode" do
+    forall cat <- TestCat.some_cat(), [:verbose] do
+      cat ==
+        cat
+        |> Serializable.encode()
+        |> Decoder.decode()
+    end
   end
 
   test "user with only the first name is handled properly" do

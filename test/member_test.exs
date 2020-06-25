@@ -1,13 +1,24 @@
 defmodule MauricioTest.Member do
   use ExUnit.Case
+  use PropCheck
 
+  alias Mauricio.Storage.{Serializable, Decoder}
   alias Mauricio.CatChat.Member
   alias Mauricio.Text
 
-  test "check person representation" do
-    assert Member.full_name(Member.new("Ivan", "Ivanov", 1)) == "Ivan Ivanov"
-    assert Member.full_name(Member.new("Ivan", nil, 1)) == "Ivan"
+  alias MauricioTest.TestData.Member, as: TestMember
+
+  doctest Mauricio.CatChat.Member
+
+  property "serialization preserve equality after encode-decode" do
+    forall member <- TestMember.some_member(), [:verbose] do
+      member ==
+        member
+        |> Serializable.encode()
+        |> Decoder.decode()
+    end
   end
+
 
   test "check string formatting" do
     assert Text.get_text(:awake_pet, who: Member.new("Ivan", "Ivanov", 1)) == """

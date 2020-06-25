@@ -25,3 +25,4 @@ katex-*.tar
 /.elixir_ls
 
 config/secret.exs
+run.sh
