@@ -67,7 +67,10 @@ defmodule Mauricio.CatChat.Chat.Interaction do
     if feeder_size > 5 do
       {{:value, old_food}, feeder} = :queue.out(feeder)
       overflow_message = Text.get_text(:feeder_overflow, old_food: old_food)
-      result_message = Enum.join([new_food_message, "", overflow_message, "", feeder_content_message(feeder)], "\n")
+
+      result_message =
+        Enum.join([new_food_message, "", overflow_message, "", feeder_content_message(feeder)], "\n")
+
       {feeder, nil, result_message}
     else
       {feeder, nil, Enum.join([new_food_message, "", feeder_content_message(feeder)], "\n")}
