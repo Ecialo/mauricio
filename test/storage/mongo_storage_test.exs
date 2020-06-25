@@ -3,7 +3,6 @@ defmodule MauricioTest.Storage.MongoStorage do
   use PropCheck
 
   alias Mauricio.Storage
-  alias Mauricio.Storage.MongoStorage
   alias MauricioTest.TestData
 
   setup do
