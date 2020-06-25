@@ -103,7 +103,6 @@ defmodule MauricioTest.CatChat.ResponseProcessing do
       times_pet: times_pet,
       laziness: laziness
     } = state.cat
-
     message = fn text -> Helpers.message_with_text(1, text) end
 
     Chat.process_message(message.("/hug"), state)

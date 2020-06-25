@@ -162,12 +162,16 @@ defmodule Mauricio.CatChat do
     do: GenServer.cast(__MODULE__, {:process_update, update})
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 =======
 >>>>>>> Take only needed fields from NadiaUpdate struct
 =======
 
 >>>>>>> Run mix format
+=======
+
+>>>>>>> c8dabacc8ed2a69c261acec9c5b4ff7095ca3c32
   def process_update(%{message: message} = update, :sync) do
     case GenServer.call(__MODULE__, {:process_update, update}) do
       :ok ->
