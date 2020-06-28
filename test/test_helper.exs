@@ -1,7 +1,6 @@
 ExUnit.start()
 
 defmodule MauricioTest.Helpers do
-
   import ExUnit.Assertions
 
   alias Nadia.Model.Update, as: NadiaUpdate
@@ -21,6 +20,7 @@ defmodule MauricioTest.Helpers do
 
   def update_with_text(chat_id, user_id \\ nil, text) do
     user_id = user_id || chat_id
+
     %NadiaUpdate{
       callback_query: nil,
       channel_post: nil,
@@ -28,19 +28,20 @@ defmodule MauricioTest.Helpers do
       edited_message: nil,
       inline_query: nil,
       message: message_with_text(chat_id, user_id, text),
-      update_id: 555290602
+      update_id: 555_290_602
     }
   end
 
   def message_with_text(chat_id, user_id \\ nil, text) do
     user_id = user_id || chat_id
+
     %NadiaMessage{
       audio: nil,
       caption: nil,
       channel_chat_created: nil,
       chat: chat(chat_id),
       contact: nil,
-      date: 1578194118,
+      date: 1_578_194_118,
       delete_chat_photo: nil,
       document: nil,
       edit_date: nil,
@@ -78,7 +79,7 @@ defmodule MauricioTest.Helpers do
       photo: nil,
       title: nil,
       type: "private",
-      username: "Zloe_Aloe",
+      username: "ZloeAloe"
     }
   end
 
@@ -87,26 +88,29 @@ defmodule MauricioTest.Helpers do
       first_name: "Yaropolk_#{user_id}",
       id: user_id,
       last_name: "#{user_id}",
-      username: "Zloe_Aloe_#{user_id}",
+      username: "Zloe_Aloe_#{user_id}"
     }
   end
 
   def body_of_captured_request() do
     :bookish_spork.capture_request()
-      |> elem(1)
-      |> Map.fetch!(:body)
-      |> URI.decode_query()
+    |> elem(1)
+    |> Map.fetch!(:body)
+    |> URI.decode_query()
   end
 
   def weak_text_eq(text, :any) when is_binary(text), do: true
+
   def weak_text_eq(text, expected_texts) when is_list(expected_texts),
     do: Enum.any?(expected_texts, fn x -> x == text end)
+
   def weak_text_eq(text, expected_text), do: text == expected_text
 
   def assert_capture_expected_text(expected_text) do
     request_text =
       body_of_captured_request()
       |> Map.fetch!("text")
+
     assert weak_text_eq(request_text, expected_text)
   end
 
@@ -129,5 +133,4 @@ defmodule MauricioTest.Helpers do
 
     assert_dialog(new_state, rest)
   end
-
 end

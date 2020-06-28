@@ -16,7 +16,6 @@ defmodule Mauricio.CatChat.Cat do
           reqs: 0..10
         }
 
-
   @derive [Serializable]
   defstruct name: nil,
             state: nil,
@@ -56,19 +55,19 @@ defmodule Mauricio.CatChat.Cat do
     }
   end
 
-  def become_lazy(cat = %Cat{laziness: 1024}, who),
+  def become_lazy(%Cat{laziness: 1024} = cat, who),
     do: {cat, who, Text.get_text(:over_lazy)}
 
-  def become_lazy(cat = %Cat{laziness: l}, who),
+  def become_lazy(%Cat{laziness: l} = cat, who),
     do: {%{cat | laziness: l * 2}, who, Text.get_text(:become_lazy)}
 
-  def become_annoying(cat = %Cat{laziness: 1}, who),
+  def become_annoying(%Cat{laziness: 1} = cat, who),
     do: {cat, who, Text.get_text(:over_annoying)}
 
-  def become_annoying(cat = %Cat{laziness: l}, who),
+  def become_annoying(%Cat{laziness: l} = cat, who),
     do: {%{cat | laziness: round(l / 2)}, who, Text.get_text(:become_annoying)}
 
-  def change_satiety(cat = %Cat{satiety: satiety, weight: weight}, :inc) do
+  def change_satiety(%Cat{satiety: satiety, weight: weight} = cat, :inc) do
     if satiety <= 10 do
       {:ok, %{cat | satiety: satiety + 1}}
     else
@@ -76,7 +75,7 @@ defmodule Mauricio.CatChat.Cat do
     end
   end
 
-  def change_satiety(cat = %Cat{satiety: satiety}, :dec) do
+  def change_satiety(%Cat{satiety: satiety} = cat, :dec) do
     {:ok, %{cat | satiety: max(satiety - 1, 0)}}
   end
 
@@ -99,10 +98,10 @@ defmodule Mauricio.CatChat.Cat do
 
   def change_weight(cat, :ok), do: cat
 
-  def change_weight(cat = %Cat{weight: weight}, :inc),
+  def change_weight(%Cat{weight: weight} = cat, :inc),
     do: %{cat | weight: weight + 1}
 
-  def change_weight(cat = %Cat{weight: weight}, :dec),
+  def change_weight(%Cat{weight: weight} = cat, :dec),
     do: %{cat | weight: max(0, weight - 1)}
 
   # Pet
@@ -128,7 +127,7 @@ defmodule Mauricio.CatChat.Cat do
   end
 
   # Eat
-  def eat(cat = %Cat{state: state}, who) do
+  def eat(%Cat{state: state} = cat, who) do
     CatState.eat(state, cat, who)
   end
 
@@ -155,7 +154,6 @@ defmodule Mauricio.CatChat.Cat do
   end
 
   # React
-
   def react_to_triggers(cat = %Cat{state: state}, who, triggers) do
     CatState.react_to_triggers(state, cat, who, triggers)
   end

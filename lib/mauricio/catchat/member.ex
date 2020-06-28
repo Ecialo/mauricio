@@ -28,7 +28,7 @@ defmodule Mauricio.CatChat.Member do
   end
 
   @spec change_karma(Member.t(), :inc | :dec) :: Member.t()
-  def change_karma(member = %Member{karma: karma}, direction) do
+  def change_karma(%Member{karma: karma} = member, direction) do
     new_karma =
       case direction do
         :inc -> min(karma + 1, Application.get_env(:mauricio, :max_karma))

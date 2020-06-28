@@ -103,7 +103,8 @@ config :mauricio,
       "ХррХррр",
     ],
     wake_up_lazy: "<i><%= cat.name %> проснулся, но только для того, чтобы пожрать.</i>",
-    wake_up_active: "<i><%= cat.name %> проснулся, потянулся и снова готов носиться по комнате.</i>",
+    wake_up_active:
+      "<i><%= cat.name %> проснулся, потянулся и снова готов носиться по комнате.</i>",
     satiety: %{
       0 => [
         "ОМНОМНОМНОМНОМНОМНОМ!!!",
@@ -171,7 +172,8 @@ config :mauricio,
       """,
       "<i><%= cat.name %> ложится спать</i>"
     ],
-    going_out: "<i>Котяре наскучило сидеть дома, и <%= cat.name %> вышел на улицу прогуляться.</i>",
+    going_out:
+      "<i>Котяре наскучило сидеть дома, и <%= cat.name %> вышел на улицу прогуляться.</i>",
     want_care: [
       """
       <i><%= cat.name %> трется о ногу <%= Member.full_name(who) %> и мурчит.</i>
@@ -228,7 +230,8 @@ config :mauricio,
     pine: 5
   }
 
-import_config "#{Mix.env}.exs"
-if Mix.env != :prod do
+import_config "#{Mix.env()}.exs"
+
+if Mix.env() != :prod do
   import_config "secret.exs"
 end

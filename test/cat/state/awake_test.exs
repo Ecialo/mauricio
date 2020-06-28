@@ -10,7 +10,7 @@ defmodule MauricioTest.Cat.State.Awake do
   alias MauricioTest.Helpers
 
   setup do
-    %{who: Member.new("A", "B", 1, 1, true), cat: Cat.new("C", Awake.new, 1, 1, 0) }
+    %{who: Member.new("A", "B", 1, 1, true), cat: Cat.new("C", Awake.new(), 1, 1, 0)}
   end
 
   describe "pet" do
@@ -22,8 +22,11 @@ defmodule MauricioTest.Cat.State.Awake do
       assert cat.times_pet == 1
     end
 
-    test "resets times_pet counter and shows angry message for too many times pet cat", %{who: who, cat: cat} do
-      cat = %{cat | times_pet: 10000}
+    test "resets times_pet counter and shows angry message for too many times pet cat", %{
+      who: who,
+      cat: cat
+    } do
+      cat = %{cat | times_pet: 10_000}
       expected_text = Text.get_all_texts(:bad_pet, who: who, cat: cat)
       {cat, _member, text} = Cat.pet(cat, who)
 
@@ -40,6 +43,7 @@ defmodule MauricioTest.Cat.State.Awake do
       Этот кот слегка ленив.
       </i>
       """
+
       {_cat, _who, message} = Cat.hug(cat, who)
       assert Helpers.weak_text_eq(expected, message)
     end
@@ -65,26 +69,28 @@ defmodule MauricioTest.Cat.State.Awake do
     end
   end
 
-
   describe "eat" do
     test_with_params "increases satiety",
-      fn satiety ->
-        who = Member.new("A", "B", 1, 10, true)
-        cat = Cat.new("C", Awake.new, 10, satiety, 0, 0)
+                     fn satiety ->
+                       who = Member.new("A", "B", 1, 10, true)
+                       cat = Cat.new("C", Awake.new(), 10, satiety, 0, 0)
 
-        expected_text = Text.get_all_texts([:satiety, cat.satiety], cat: cat, who: who)
-        expected_anon = Text.get_all_texts([:satiety, cat.satiety], cat: cat, who: :no_one)
+                       expected_text =
+                         Text.get_all_texts([:satiety, cat.satiety], cat: cat, who: who)
 
-        {new_cat, _member, text} = Cat.eat(cat, who)
-        {new_cat_anon, _member, text_anon} = Cat.eat(cat, :no_one)
+                       expected_anon =
+                         Text.get_all_texts([:satiety, cat.satiety], cat: cat, who: :no_one)
 
-        assert Helpers.weak_text_eq(text, expected_text)
-        assert Helpers.weak_text_eq(text_anon, expected_anon)
+                       {new_cat, _member, text} = Cat.eat(cat, who)
+                       {new_cat_anon, _member, text_anon} = Cat.eat(cat, :no_one)
 
-        assert new_cat.satiety == satiety + 1
-        assert new_cat_anon.satiety == satiety + 1
-      end do
-        Enum.map(0..10, &{&1,})
+                       assert Helpers.weak_text_eq(text, expected_text)
+                       assert Helpers.weak_text_eq(text_anon, expected_anon)
+
+                       assert new_cat.satiety == satiety + 1
+                       assert new_cat_anon.satiety == satiety + 1
+                     end do
+      Enum.map(0..10, &{&1})
     end
 
     test "makes cat vomit if satiety is too high", %{who: who, cat: cat} do
@@ -181,8 +187,8 @@ defmodule MauricioTest.Cat.State.Awake do
   describe "react_to_triggers" do
     test "react to triggers" do
       member = Member.new("A", "B", 1, 1, true)
-      cat = Cat.new("C", Awake.new, 1, 1, 0)
-      triggers = Text.find_triggers("Скушай!") |> IO.inspect()
+      cat = Cat.new("C", Awake.new(), 1, 1, 0)
+      triggers = Text.find_triggers("Скушай!")
       State.react_to_triggers(nil, cat, member, triggers)
     end
   end
@@ -190,6 +196,7 @@ defmodule MauricioTest.Cat.State.Awake do
   describe "hungry" do
     test "increases satiety when there is food", %{cat: cat} do
       feeder = :queue.from_list(["хрючево"])
+
       [
         {new_feeder, nil, food_from_feeder_message},
         {new_cat, nil, eat_message}
@@ -199,14 +206,16 @@ defmodule MauricioTest.Cat.State.Awake do
 
       assert new_feeder == n_f
       assert new_cat.satiety == cat.satiety + 1
+
       assert Helpers.weak_text_eq(
-        food_from_feeder_message,
-        Text.get_all_texts(:feeder_consume, cat: cat, food: food)
-      )
+               food_from_feeder_message,
+               Text.get_all_texts(:feeder_consume, cat: cat, food: food)
+             )
+
       assert Helpers.weak_text_eq(
-        eat_message,
-        Text.get_all_texts([:satiety, cat.satiety], cat: cat, who: :no_one)
-      )
+               eat_message,
+               Text.get_all_texts([:satiety, cat.satiety], cat: cat, who: :no_one)
+             )
     end
 
     test "does nothing when there's no food", %{cat: cat} do
@@ -214,5 +223,4 @@ defmodule MauricioTest.Cat.State.Awake do
       assert nil == Cat.hungry(cat, feeder)
     end
   end
-
 end

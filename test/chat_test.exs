@@ -28,13 +28,17 @@ defmodule MauricioTest.Chat do
 
     {:noreply, state} = Chat.handle_continue(:start, chat_id)
     Helpers.assert_capture_expected_text(Text.get_text(:start))
+
     dialog = [
       {m.("крутой уокер "), "<i>Котeйке нравится имя Крутой Уокер.</i>\n"}
     ]
+
     Helpers.assert_dialog(state, dialog)
+
     bad_dialog = [
       {m.(""), "<i>Котик решил, что будет зваться Мяурицио.</i>\n"}
     ]
+
     %{cat: %Cat{name: name}} = Helpers.assert_dialog(state, bad_dialog)
     assert name == Application.get_env(:mauricio, :default_name)
   end
@@ -43,7 +47,7 @@ defmodule MauricioTest.Chat do
     state = put_in(chat_with_turbo_cat().cat.energy, 0)
     {:noreply, new_state} = Chat.handle_info(:tire, state)
 
-    assert new_state.cat.state == Sleep.new
+    assert new_state.cat.state == Sleep.new()
     Helpers.assert_capture_expected_text(:any)
     assert_receive :tire
   end
@@ -51,7 +55,7 @@ defmodule MauricioTest.Chat do
   test "handle pine want care" do
     state = chat_with_turbo_cat()
     {:noreply, new_state} = Chat.handle_info(:pine, state)
-    assert new_state.cat.state == WantCare.new
+    assert new_state.cat.state == WantCare.new()
     Helpers.assert_capture_expected_text(:any)
     assert_receive :pine
   end
@@ -72,13 +76,16 @@ defmodule MauricioTest.Chat do
 
     assert new_state.cat.weight == 1
     refute_receive :metabolic
-
   end
 
   test "handle hungry" do
     state = put_in(chat_with_turbo_cat().feeder, :queue.from_list(["eda"]))
     {:noreply, new_state} = Chat.handle_info(:hungry, state)
-    Helpers.assert_capture_expected_text(Text.get_text(:feeder_consume, cat: state.cat, food: "eda"))
+
+    Helpers.assert_capture_expected_text(
+      Text.get_text(:feeder_consume, cat: state.cat, food: "eda")
+    )
+
     Helpers.assert_capture_expected_text(:any)
     assert new_state.cat.satiety == state.cat.satiety + 1
     assert_receive :hungry
@@ -89,9 +96,11 @@ defmodule MauricioTest.Chat do
     Storage.put(state)
     {:noreply, start_state} = Chat.handle_continue(:start, 1)
     assert start_state == state
+
     for signal <- [:tire, :pine, :metabolic, :hungry] do
       assert_receive signal
     end
+
     Storage.pop(1)
   end
 
@@ -103,5 +112,4 @@ defmodule MauricioTest.Chat do
         |> Decoder.decode()
     end
   end
-
 end

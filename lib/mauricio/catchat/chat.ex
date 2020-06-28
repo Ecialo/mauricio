@@ -3,11 +3,11 @@ defmodule Mauricio.CatChat.Chat do
 
   require Logger
 
-  alias Nadia.Model.Message, as: NadiaMessage
   alias Mauricio.CatChat.{Member, Cat}
   alias Mauricio.CatChat.Chat.{Interaction, Responses}
   alias Mauricio.Text
   alias Mauricio.Storage
+  alias Mauricio.Acceptor
 
   alias __MODULE__, as: Chat
 
@@ -108,7 +108,7 @@ defmodule Mauricio.CatChat.Chat do
     {:noreply, new_state}
   end
 
-  @spec process_message(NadiaMessage.t(), Chat.state()) :: Chat.state()
+  @spec process_message(Acceptor.unpacked_nadia_message(), Chat.state()) :: Chat.state()
   def process_message(message, state) when is_map(state) do
     responses = Interaction.process_message(message, state)
     new_state = Responses.process_responses(responses, state)
@@ -116,7 +116,7 @@ defmodule Mauricio.CatChat.Chat do
     new_state
   end
 
-  def process_message(%NadiaMessage{text: text} = message, chat_id) do
+  def process_message(%{text: text} = message, chat_id) do
     default_name = Application.get_env(:mauricio, :default_name)
 
     {name, key} =
@@ -203,7 +203,7 @@ defmodule Mauricio.CatChat.Chat do
     }
   end
 
-  def new_state(chat_id, %NadiaMessage{from: user}, cat_name) do
+  def new_state(chat_id, %{from: user}, cat_name) do
     cat = Cat.new(cat_name)
 
     members = %{
@@ -241,7 +241,6 @@ defmodule Mauricio.CatChat.Chat do
     name |> String.split() |> Enum.map(&String.capitalize/1) |> Enum.join(" ")
   end
 
-
   defimpl Mauricio.Storage.Serializable do
     alias Mauricio.Storage.Decoder
 
@@ -254,7 +253,5 @@ defmodule Mauricio.CatChat.Chat do
       |> Enum.map(fn {k, v} -> {Atom.to_string(k), @protocol.encode(v)} end)
       |> List.insert_at(0, Decoder.struct_field(struct_name))
     end
-
   end
-
 end
