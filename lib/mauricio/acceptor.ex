@@ -35,7 +35,8 @@ defmodule Mauricio.Acceptor do
     |> List.wrap()
     |> Nadia.Parser.parse_result("getUpdates")
     |> hd()
-    |> call_process_update()
+    |> unpack_update_struct()
+    |> CatChat.process_update(:sync)
 
     {200, [], ""}
   end
@@ -48,20 +49,31 @@ defmodule Mauricio.Acceptor do
     {404, [], "Our princess is in another castle..."}
   end
 
-  def call_process_update(%NadiaUpdate{
-         message: %NadiaMessage{
-           chat: %NadiaChat{id: chat_id},
-           date: date,
-           from: from,
-           message_id: message_id,
-           text: text
-         },
-         update_id: update_id
-       }, mode \\ :sync) do
-    CatChat.process_update(%{
-      message: %{chat: %{id: chat_id}, date: date, from: from, message_id: message_id, text: text},
+  @spec unpack_update_struct(NadiaUpdate.t()) :: Acceptor.unpacked_nadia_message()
+  def unpack_update_struct(%NadiaUpdate{message: message, update_id: update_id}) when not is_nil(message) do
+    %NadiaMessage{
+      chat: %NadiaChat{id: chat_id},
+      date: date,
+      from: from,
+      message_id: message_id,
+      text: text
+    } = message
+
+    %{
+      message: %{
+        chat: %{id: chat_id},
+        date: date,
+        from: from,
+        message_id: message_id,
+        text: text
+      },
       update_id: update_id
-    }, mode)
+    }
+  end
+
+  def unpack_update_struct(update) do
+    Logger.warn(inspect(update))
+    %{message: nil}
   end
 
   @impl :elli_handler

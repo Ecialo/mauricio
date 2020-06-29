@@ -2,7 +2,6 @@ defmodule Mauricio.CatChat.Chat.Interaction do
   require Logger
 
   alias Nadia.Model.User, as: NadiaUser
-
   alias Mauricio.CatChat.{Member, Cat}
   alias Mauricio.Text
 

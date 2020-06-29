@@ -100,8 +100,8 @@ defmodule Mauricio.CatChat do
     {:noreply, catsup_pid}
   end
 
-  def handle_update(%{message: %{chat: %{id: chat_id}, text: text} = message}, mode)
-      when not is_nil(message) do
+  def handle_update(%{message: message}, mode) when not is_nil(message) do
+    %{chat: %{id: chat_id}, text: text} = message
     Logger.log(:info, "Message from #{chat_id} with text #{text}")
 
     chat_pid = CatSup.get_chat(chat_id)
@@ -142,10 +142,7 @@ defmodule Mauricio.CatChat do
     end
   end
 
-  def handle_update(update, _mode) do
-    Logger.warn(inspect(update))
-    :ok
-  end
+  def handle_update(_, _), do: :ok
 
   def handle_cast({:process_update, update}, catsup_pid) do
     handle_update(update, :async)
@@ -161,7 +158,7 @@ defmodule Mauricio.CatChat do
   def process_update(update, :async),
     do: GenServer.cast(__MODULE__, {:process_update, update})
 
-    def process_update(%{message: message} = update, :sync) do
+  def process_update(%{message: message} = update, :sync) do
     case GenServer.call(__MODULE__, {:process_update, update}) do
       :ok ->
         :ok

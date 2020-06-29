@@ -3,7 +3,6 @@ defmodule MauricioTest.CatTest do
   use PropCheck
 
   alias Nadia.Model.User, as: NadiaUser
-
   alias Mauricio.CatChat.{Cat, Member}
   alias Mauricio.CatChat.Cat.State.{Awake, Away, WantCare}
   alias Mauricio.Storage.{Serializable, Decoder}

@@ -3,6 +3,7 @@ defmodule MauricioTest.Acceptor do
 
   alias Mauricio.Acceptor
   alias Mauricio.CatChat.Chats
+  alias MauricioTest.Helpers
 
   setup_all do
     children = [{Mauricio.Acceptor, [port: 4001]}]
@@ -100,5 +101,28 @@ defmodule MauricioTest.Acceptor do
              supervisors: 0,
              workers: 0
            }
+  end
+
+  describe "unpack_update_struct" do
+    test "correctly unpacks new message struct" do
+      new_message = Helpers.update_with_text(1, "new message")
+
+      assert %{
+               message: %{
+                 chat: %{id: _},
+                 date: _,
+                 from: %{first_name: _, id: _, last_name: _, username: _},
+                 message_id: _,
+                 text: _
+               },
+               update_id: _
+             } = Acceptor.unpack_update_struct(new_message)
+    end
+
+    test "ignores edited message" do
+      edited_message = Helpers.edited_message(1, "edit")
+
+      assert %{message: nil} = Acceptor.unpack_update_struct(edited_message)
+    end
   end
 end
