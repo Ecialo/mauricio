@@ -2,8 +2,6 @@ defmodule MauricioTest.CatTest do
   use ExUnit.Case
   use PropCheck
 
-  alias Nadia.Model.User, as: NadiaUser
-
   alias Mauricio.CatChat.{Cat, Member}
   alias Mauricio.CatChat.Cat.State.{Awake, Away, WantCare}
   alias Mauricio.Storage.{Serializable, Decoder}
@@ -59,7 +57,7 @@ defmodule MauricioTest.CatTest do
     for member <- [
           Member.new("One", nil, 1),
           Member.new("One", nil, 1, 1, True),
-          Member.new(%NadiaUser{first_name: "One", last_name: nil, id: 1})
+          Member.new(%{first_name: "One", last_name: nil, id: 1})
         ] do
       {_cat, _member, text} = Cat.pet(cat, member)
       assert text == expected_text

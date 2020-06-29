@@ -71,6 +71,37 @@ defmodule MauricioTest.Helpers do
     }
   end
 
+  def edited_message(chat_id, user_id \\ nil, text) do
+    user_id = user_id || chat_id
+
+    %NadiaUpdate{
+      callback_query: nil,
+      channel_post: nil,
+      chosen_inline_result: nil,
+      edited_message: %{
+        chat: %{
+          id: chat_id,
+          title: "Chat title",
+          type: "private"
+        },
+        date: 1_578_194_118,
+        edit_date: 1_578_194_119,
+        from: %{
+          first_name: "name",
+          id: user_id,
+          is_bot: false,
+          last_name: "name",
+          username: "username"
+        },
+        message_id: 123,
+        text: text
+      },
+      inline_query: nil,
+      message: nil,
+      update_id: 123_123_123
+    }
+  end
+
   def chat(chat_id) do
     %NadiaChat{
       first_name: "Yaropolk",

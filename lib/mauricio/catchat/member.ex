@@ -1,5 +1,4 @@
 defmodule Mauricio.CatChat.Member do
-  alias Nadia.Model.User, as: NadiaUser
   alias Mauricio.Storage.Serializable
 
   alias __MODULE__, as: Member
@@ -23,7 +22,7 @@ defmodule Mauricio.CatChat.Member do
     %Member{fname: fname, sname: sname, id: id, karma: karma, participant?: participant?}
   end
 
-  def new(%NadiaUser{first_name: fname, last_name: sname, id: id}) do
+  def new(%{first_name: fname, last_name: sname, id: id}) do
     new(fname, sname, id)
   end
 
