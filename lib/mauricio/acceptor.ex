@@ -7,17 +7,17 @@ defmodule Mauricio.Acceptor do
   alias Nadia.Model.User, as: NadiaUser
 
   @type unpacked_nadia_message :: %{
-          chat: %{id: integer()},
-          date: integer(),
-          from: map(),
-          message_id: integer(),
-          text: binary()
-        }
+    chat: %{id: integer()},
+    date: integer(),
+    from: NadiaUser.t(),
+    message_id: integer(),
+    text: binary()
+  }
 
   @type unpacked_nadia_update :: %{
-          message: unpacked_nadia_message(),
-          update_id: integer()
-        }
+    message: unpacked_nadia_message(),
+    update_id: integer()
+  }
 
   @behaviour :elli_handler
 
@@ -50,23 +50,11 @@ defmodule Mauricio.Acceptor do
   end
 
   @spec unpack_update_struct(NadiaUpdate.t()) :: Acceptor.unpacked_nadia_message()
-  def unpack_update_struct(%NadiaUpdate{message: nil, update_id: update_id} = update) do
-    %{edited_message: edited_message} = update
-
-    %{chat: %{id: chat_id}, date: date, from: from, message_id: message_id, text: text} =
-      edited_message
-
-    %{
-      message: %{chat: %{id: chat_id}, date: date, from: from, message_id: message_id, text: text},
-      update_id: update_id
-    }
-  end
-
-  def unpack_update_struct(%NadiaUpdate{message: message, update_id: update_id}) do
+  def unpack_update_struct(%NadiaUpdate{message: message, update_id: update_id}) when not is_nil(message) do
     %NadiaMessage{
       chat: %NadiaChat{id: chat_id},
       date: date,
-      from: %NadiaUser{first_name: first_name, id: id, last_name: last_name, username: username},
+      from: from,
       message_id: message_id,
       text: text
     } = message
@@ -75,12 +63,17 @@ defmodule Mauricio.Acceptor do
       message: %{
         chat: %{id: chat_id},
         date: date,
-        from: %{first_name: first_name, id: id, last_name: last_name, username: username},
+        from: from,
         message_id: message_id,
         text: text
       },
       update_id: update_id
     }
+  end
+
+  def unpack_update_struct(update) do
+    Logger.warn(inspect(update))
+    %{message: nil}
   end
 
   @impl :elli_handler

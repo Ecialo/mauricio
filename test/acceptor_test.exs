@@ -119,19 +119,10 @@ defmodule MauricioTest.Acceptor do
              } = Acceptor.unpack_update_struct(new_message)
     end
 
-    test "correctly unpacks edited message struct" do
+    test "ignores edited message" do
       edited_message = Helpers.edited_message(1, "edit")
 
-      assert %{
-               message: %{
-                 chat: %{id: _},
-                 date: _,
-                 from: %{first_name: _, id: _, last_name: _, username: _},
-                 message_id: _,
-                 text: _
-               },
-               update_id: _
-             } = Acceptor.unpack_update_struct(edited_message)
+      assert %{message: nil} = Acceptor.unpack_update_struct(edited_message)
     end
   end
 end
