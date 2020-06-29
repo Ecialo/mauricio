@@ -100,7 +100,8 @@ defmodule Mauricio.CatChat do
     {:noreply, catsup_pid}
   end
 
-  def handle_update(%{message: %{chat: %{id: chat_id}, text: text} = message}, mode) when not is_nil(message) do
+  def handle_update(%{message: message}, mode) when not is_nil(message) do
+    %{chat: %{id: chat_id}, text: text} = message
     Logger.log(:info, "Message from #{chat_id} with text #{text}")
 
     chat_pid = CatSup.get_chat(chat_id)
