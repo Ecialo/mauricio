@@ -157,8 +157,4 @@ defmodule Mauricio.CatChat.Cat do
   def react_to_triggers(cat = %Cat{state: state}, who, triggers) do
     CatState.react_to_triggers(state, cat, who, triggers)
   end
-
-  def get_cat_name_template(inflection, is_upcase \\ false) do
-    Application.get_env(:mauricio, :text) |> get_in([:cat_name, inflection]) |> Enum.random()
-  end
 end
