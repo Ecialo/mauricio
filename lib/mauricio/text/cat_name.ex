@@ -1,9 +1,11 @@
 defmodule Mauricio.Text.CatName do
-  def fetch(inflection, capitalize) do
+  def fetch(_, _, :test), do: "Cat"
+  def fetch(inflection, capitalize, _) do
     names_from_config(inflection, capitalize) |> Enum.random()
   end
 
-  def fetch(inflection, capitalize, real_name) do
+  def fetch(_, _, _, :test), do: "Cat"
+  def fetch(inflection, capitalize, real_name, _) do
     names_from_config(inflection, capitalize)
     |> weighted_choice(real_name, :rand.uniform(), Application.get_env(:mauricio, :real_name_probability))
   end

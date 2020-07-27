@@ -14,7 +14,7 @@ defmodule MauricioTest.CatTest do
     cat = Cat.new("C", WantCare.new(), 1, 1, 0)
 
     expected_text = """
-    <i>A B гладит котика.</i>
+    <i>A B гладит Cat.</i>
     Мурррррррр.
     """
 
@@ -32,7 +32,7 @@ defmodule MauricioTest.CatTest do
     {cat, _member, text} = Cat.pet(cat, member)
 
     expected_text = """
-    <i>A B хочет погладить котяру, но обнаруживает, что того нет дома.</i>
+    <i>A B хочет погладить Cat, но обнаруживает, что того нет дома.</i>
     """
 
     assert text == expected_text
@@ -50,7 +50,7 @@ defmodule MauricioTest.CatTest do
 
   test "user with only the first name is handled properly" do
     expected_text = """
-    <i>One хочет погладить котяру, но обнаруживает, что того нет дома.</i>
+    <i>One хочет погладить Cat, но обнаруживает, что того нет дома.</i>
     """
 
     cat = Cat.new("Mau", Away.new(), 1, 1, 0)

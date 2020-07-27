@@ -10,4 +10,5 @@ config :mauricio,
       "mongodb://" <>
         System.get_env("MONGODB_HOST", "localhost") <>
         ":" <> System.get_env("MONGODB_PORT", "27017") <> "/db-name"
-  ]
+  ],
+  env: :test
