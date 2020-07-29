@@ -2,7 +2,7 @@ defmodule MauricioTest.TextTest do
   use ExUnit.Case
 
   alias Mauricio.Text
-  alias Mauricio.Text.CatName
+  alias Mauricio.Text.Cat, as: CatName
   alias Mauricio.CatChat.{Member, Cat}
 
   test "triggers in text" do
@@ -38,19 +38,25 @@ defmodule MauricioTest.TextTest do
 
   describe "fetch cat name" do
     test "returns capitalized name" do
-      cat_name = CatName.fetch(:nominative, true, :not_test)
+      cat_name = CatName.capitalized_name_in(:nominative, :not_test)
       assert cat_name == String.capitalize(cat_name)
     end
 
     test "returns random name from config" do
       names = Application.get_env(:mauricio, :text) |> get_in([:name_variants, :nominative])
-      assert CatName.fetch(:nominative, false, :not_test) in names
+      assert CatName.name_in(:nominative, :not_test) in names
     end
 
     test "returns real cat name according to probability in config" do
-      trials = for _ <- 1..10000, do: CatName.fetch(:nominative, true, "Cat", :not_test)
+      trials = for _ <- 1..10000, do: CatName.capitalized_name_in(:nominative, "Cat", :not_test)
       actual = Enum.count(trials, fn name -> name == "Cat" end) / 10000
       assert_in_delta actual, Application.get_env(:mauricio, :real_name_probability), 0.01
+    end
+
+    test "returns every possible name" do
+      expected = Application.get_env(:mauricio, :text) |> get_in([:name_variants, :nominative]) |> Enum.sort()
+      actual = 1..1000 |> Enum.map(fn _ -> CatName.name_in(:nominative, :not_test) end) |> Enum.uniq() |> Enum.sort()
+      assert expected == actual
     end
   end
 end

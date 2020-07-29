@@ -12,7 +12,7 @@ defmodule Mauricio.Text do
   Evaluate a template with the aid of custom functions.
   """
   def rich_eval(source, bindings) do
-    EEx.eval_string(source, bindings, aliases: [{Member, Mauricio.CatChat.Member}, {CatName, Mauricio.Text.CatName}])
+    EEx.eval_string(source, bindings, aliases: [{Member, Mauricio.CatChat.Member}, {Cat, Mauricio.Text.Cat}])
   end
 
   def get_text(key, opts \\ []) do

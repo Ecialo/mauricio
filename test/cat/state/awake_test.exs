@@ -38,8 +38,8 @@ defmodule MauricioTest.Cat.State.Awake do
   describe "hug" do
     test "shows cat's current state message", %{who: who, cat: cat} do
       expected = """
-      <i>A B обнимает бегающего туда-сюда Cat.
-      C не придаёт вам значения. Навскидку Cat весит </i><b>1</b><i> кило и, кажется, продолжает худеть.
+      <i>A B обнимает бегающего туда-сюда cat.
+      C не придаёт вам значения. Навскидку cat весит </i><b>1</b><i> кило и, кажется, продолжает худеть.
       Cat слегка ленив.
       </i>
       """
