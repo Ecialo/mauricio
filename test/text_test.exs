@@ -38,24 +38,25 @@ defmodule MauricioTest.TextTest do
 
   describe "fetch cat name" do
     test "returns capitalized name" do
-      cat_name = CatName.capitalized_name_in(:nominative, :not_test)
+      cat_name = CatName.capitalized_name_in(:every_nominative)
       assert cat_name == String.capitalize(cat_name)
     end
 
     test "returns random name from config" do
-      names = Application.get_env(:mauricio, :text) |> get_in([:name_variants, :nominative])
-      assert CatName.name_in(:nominative, :not_test) in names
+      names = Application.get_env(:mauricio, :name_variants) |> get_in([:every_nominative])
+      assert CatName.name_in(:every_nominative) in names
     end
 
     test "returns real cat name according to probability in config" do
-      trials = for _ <- 1..10000, do: CatName.capitalized_name_in(:nominative, "Cat", :not_test)
+      expected = 0.6
+      trials = for _ <- 1..10000, do: CatName.capitalized_name_in(:every_nominative, "Cat", expected)
       actual = Enum.count(trials, fn name -> name == "Cat" end) / 10000
-      assert_in_delta actual, Application.get_env(:mauricio, :real_name_probability), 0.01
+      assert_in_delta actual, expected, 0.01
     end
 
     test "returns every possible name" do
-      expected = Application.get_env(:mauricio, :text) |> get_in([:name_variants, :nominative]) |> Enum.sort()
-      actual = 1..1000 |> Enum.map(fn _ -> CatName.name_in(:nominative, :not_test) end) |> Enum.uniq() |> Enum.sort()
+      expected = Application.get_env(:mauricio, :name_variants) |> get_in([:every_nominative]) |> Enum.sort()
+      actual = 1..1000 |> Enum.map(fn _ -> CatName.name_in(:every_nominative) end) |> Enum.uniq() |> Enum.sort()
       assert expected == actual
     end
   end
