@@ -135,7 +135,7 @@ config :mauricio,
         """,
         """
         <i><%= Cat.capitalized_name_in(:nominative, cat.name) %> смотрит на еду тяжелым взглядом, полным бесконечного презрения, но знает, что должен её съесть.</i>
-        """
+        """,
       ],
       vomit: """
       <i><%= Cat.capitalized_name_in(:nominative, cat.name) %> съел слишком много, и его стошнило. <%= if not is_atom(who) do Member.full_name(who) <> ", это твоя вина!" else "В этом явно виноват только он сам." end %></i>
