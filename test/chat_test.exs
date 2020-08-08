@@ -30,13 +30,13 @@ defmodule MauricioTest.Chat do
     Helpers.assert_capture_expected_text(Text.get_text(:start))
 
     dialog = [
-      {m.("крутой уокер "), "<i>Котeйке нравится имя Крутой Уокер.</i>\n"}
+      {m.("крутой уокер "), "<i>Cat нравится имя Крутой Уокер.</i>\n"}
     ]
 
     Helpers.assert_dialog(state, dialog)
 
     bad_dialog = [
-      {m.(""), "<i>Котик решил, что будет зваться Мяурицио.</i>\n"}
+      {m.(""), "<i>Cat решил, что будет зваться Мяурицио.</i>\n"}
     ]
 
     %{cat: %Cat{name: name}} = Helpers.assert_dialog(state, bad_dialog)

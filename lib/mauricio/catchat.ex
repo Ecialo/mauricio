@@ -75,8 +75,6 @@ defmodule Mauricio.CatChat do
 
   alias Mauricio.CatChat.Supervisor, as: CatSup
   alias Mauricio.Text
-  alias Mauricio.CatChat.Supervisor, as: CatSup
-  alias Mauricio.Text
   alias Mauricio.Storage
 
   @start_command "/start"

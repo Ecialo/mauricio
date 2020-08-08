@@ -38,9 +38,9 @@ defmodule MauricioTest.Cat.State.Awake do
   describe "hug" do
     test "shows cat's current state message", %{who: who, cat: cat} do
       expected = """
-      <i>A B обнимает бегающего туда-сюда котика.
-      C не придаёт вам значения. Навскидку котейка весит </i><b>1</b><i> кило и, кажется, продолжает худеть.
-      Этот кот слегка ленив.
+      <i>A B обнимает бегающего туда-сюда cat.
+      C не придаёт вам значения. Навскидку cat весит </i><b>1</b><i> кило и, кажется, продолжает худеть.
+      Cat слегка ленив.
       </i>
       """
 
@@ -115,7 +115,7 @@ defmodule MauricioTest.Cat.State.Awake do
   end
 
   describe "tire" do
-    test "substracts energy if there is some", %{who: who, cat: cat} do
+    test "subtracts energy if there is some", %{who: who, cat: cat} do
       {new_cat, nil, nil} = Cat.tire(cat, who)
       assert new_cat.energy == cat.energy - 1
     end
