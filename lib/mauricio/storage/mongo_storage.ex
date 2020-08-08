@@ -16,7 +16,7 @@ defmodule Mauricio.Storage.MongoStorage do
     name = name || BaseStorage.name()
     GenServer.start_link(Storage, opts, name: name)
   end
-  
+
   @spec handle_get_all_ids(GenServer.from(), storage()) :: all_ids_reply()
   def handle_get_all_ids(_from, storage) do
     result =
