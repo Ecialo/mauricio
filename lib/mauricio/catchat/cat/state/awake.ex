@@ -109,5 +109,6 @@ defmodule Mauricio.CatChat.Cat.State.Awake do
     defdelegate metabolic(state, cat, who), to: Awake
     defdelegate react_to_triggers(state, cat, who, triggers), to: State
     defdelegate hungry(state, cat, feeder), to: Awake
+    def dinner_call(%Awake{}, _cat, _who), do: nil
   end
 end

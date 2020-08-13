@@ -51,5 +51,8 @@ defmodule Mauricio.CatChat.Cat.State.Sleep do
     defp wake_up_key(_), do: :wake_up_active
     defdelegate metabolic(state, cat, who), to: Awake
     defdelegate react_to_triggers(state, cat, who, triggers), to: State
+    def dinner_call(%Sleep{}, cat, who) do
+      {%{cat | state: Awake.new()}, Member.change_karma(who, :inc), Text.get_text(:wake_up_dinner_call, cat: cat)}
+    end
   end
 end

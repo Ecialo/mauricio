@@ -195,6 +195,12 @@ config :mauricio,
     feeder_consume: """
     <i><%= Cat.capitalized_name_in(:nominative, cat.name) %> съедает из кормушки</i> <b><%= food %>.</b>
     """,
+    away_dinner_call: """
+    <i><%= Cat.capitalized_name_in(:nominative, cat.name) %> слышит, как <%= Member.full_name(who) %> зовёт его обедать, и мгновенно оказывается дома.</i>
+    """,
+    wake_up_dinner_call: """
+    <i>Очевидно, что еда для <%= Cat.name_in(:genitive) %> важнее сна.</i>
+    """,
     laziness: %{
       1 => "сама надоедливость!",
       2 => "фантастически надоедлив!",

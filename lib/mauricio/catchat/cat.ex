@@ -153,6 +153,10 @@ defmodule Mauricio.CatChat.Cat do
     CatState.hungry(state, cat, feeder)
   end
 
+  def dinner_call(%Cat{state: state} = cat, who) do
+    CatState.dinner_call(state, cat, who)
+  end
+
   # React
   def react_to_triggers(cat = %Cat{state: state}, who, triggers) do
     CatState.react_to_triggers(state, cat, who, triggers)

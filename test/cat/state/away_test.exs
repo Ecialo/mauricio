@@ -39,4 +39,15 @@ defmodule MauricioTest.Cat.State.Away do
       assert cat.state == Awake.new()
     end
   end
+
+  describe "dinner_call" do
+    test "returns cat home, but doesn't feed him", %{member: member, cat: cat} do
+      expected = Text.get_text(:away_dinner_call, who: member, cat: cat)
+      {new_cat, _member, text} = Cat.dinner_call(cat, member)
+
+      assert Helpers.weak_text_eq(text, expected)
+      assert new_cat.state == Awake.new()
+      assert new_cat.satiety == cat.satiety
+    end
+  end
 end

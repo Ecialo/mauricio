@@ -30,5 +30,8 @@ defmodule Mauricio.CatChat.Cat.State.Away do
     def eat(%Away{}, _cat, _who), do: nil
     def hungry(%Away{}, _cat, _feeder), do: nil
     def metabolic(%Away{}, _cat, _who), do: nil
+    def dinner_call(%Away{}, cat, who) do
+      {%{cat | state: Awake.new()}, who, Text.get_text(:away_dinner_call, cat: cat, who: who)}
+    end
   end
 end

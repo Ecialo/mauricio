@@ -49,5 +49,6 @@ defmodule Mauricio.CatChat.Cat.State.WantCare do
       }
 
     defdelegate react_to_triggers(state, cat, who, triggers), to: State
+    def dinner_call(%WantCare{}, _cat, _who), do: nil
   end
 end

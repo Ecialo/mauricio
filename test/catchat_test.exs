@@ -75,25 +75,30 @@ defmodule MauricioTest.CatChat.ResponseProcessing do
     cat = chat_state.cat
     cat_satiety = cat.satiety
 
-    fast_trigger = fn trigger ->
-      Cat.react_to_triggers(cat, who, [trigger])
+    fast_trigger = fn cat, triggers ->
+      Cat.react_to_triggers(cat, who, triggers)
       |> List.wrap()
       |> Responses.process_responses(chat_state)
     end
 
-    st = fast_trigger.(:banish)
+    st = fast_trigger.(cat, [:banish])
     Helpers.assert_capture_expected_text(Text.get_text(:banished, cat: cat, who: who))
     assert st.members[who.id].participant? == false
 
-    st = fast_trigger.(:eat)
+    st = fast_trigger.(cat, [:eat])
     Helpers.assert_capture_expected_text(:any)
     assert st.cat.satiety == cat_satiety + 1
 
-    _st = fast_trigger.(:mew)
+    _st = fast_trigger.(cat, [:mew])
     Helpers.assert_capture_expected_text(:any)
 
-    _st = fast_trigger.(:cat)
+    _st = fast_trigger.(cat, [:cat])
     Helpers.assert_capture_photo_or_animation()
+
+    cat = %{cat | state: Cat.State.Away.new()}
+    st = fast_trigger.(cat, [:loud, :eat])
+    Helpers.assert_capture_expected_text(Text.get_text(:away_dinner_call, cat: cat, who: who))
+    assert st.cat.state == Cat.State.Awake.new()
   end
 
   test "process response from command" do
