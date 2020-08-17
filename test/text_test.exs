@@ -27,12 +27,12 @@ defmodule MauricioTest.TextTest do
     cat = Cat.new("Cat")
     who = Member.new("Лол", "Кек", 1)
 
-    assert Text.get_text([:satiety, 10, 1], who: who, cat: cat) == """
-           <i>Cat не притрагивается к еде и смотрит на Лол Кек тяжелым взглядом, полным бесконечного презрения.</i>
+    assert Text.get_text([:satiety, 10, 0], who: who, cat: cat) == """
+           <i>Cat долго принюхивается к еде. Он понимает, что не хочет есть, но Лол Кек говорит, что надо.</i>
            """
 
-    assert Text.get_text([:satiety, 10, 1], who: :feeder, cat: cat) == """
-           <i>Cat не притрагивается к еде и смотрит на кормушку тяжелым взглядом, полным бесконечного презрения.</i>
+    assert Text.get_text([:satiety, 10, 0], who: :feeder, cat: cat) == """
+           <i>Cat долго принюхивается к еде. Он понимает, что не хочет есть, но голос свыше говорит, что надо.</i>
            """
   end
 

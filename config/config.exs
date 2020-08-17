@@ -109,10 +109,10 @@ config :mauricio,
       0 => [
         "ОМНОМНОМНОМНОМНОМНОМ!!!",
         "<i><%= Cat.capitalized_name_in(:nominative, cat.name) %> заточил всю еду в мгновение ока.</i>",
-        "<i><%= Cat.capitalized_name_in(:nominative, cat.name) %> слопал еду и даже кормушку слегка погрыз!</i>",
+        "<i><%= Cat.capitalized_name_in(:nominative, cat.name) %> слопал еду!</i>",
       ],
       1 => [
-        "<i>Громко мурча и чавкая, <%= Cat.name_in(:nominative) %> уплетает свою еду, а потом вылизывает кормушку.</i>",
+        "<i>Громко мурча и чавкая, <%= Cat.name_in(:nominative) %> уплетает свою еду.</i>",
         "НЯМ-НЯМ-НЯМ!"
       ],
       2 => [
@@ -130,9 +130,11 @@ config :mauricio,
       8 => "<i><%= Cat.capitalized_name_in(:nominative, cat.name) %> без особого энтузиазма съедает свой корм.</i>",
       9 => "<i>В <%= Cat.name_in(:accusative) %> едва лезет!</i>",
       10 => [
-        "<i><%= Cat.capitalized_name_in(:nominative, cat.name) %> долго принюхивается и зарывает кормушку.</i>",
         """
-        <i><%= Cat.capitalized_name_in(:nominative, cat.name) %> не притрагивается к еде и смотрит на <%= if not is_atom(who) do Member.full_name(who) else "кормушку" end %> тяжелым взглядом, полным бесконечного презрения.</i>
+        <i><%= Cat.capitalized_name_in(:nominative, cat.name) %> долго принюхивается к еде. Он понимает, что не хочет есть, но <%= if not is_atom(who) do Member.full_name(who) else "голос свыше" end %> говорит, что надо.</i>
+        """,
+        """
+        <i><%= Cat.capitalized_name_in(:nominative, cat.name) %> смотрит на еду тяжелым взглядом, полным бесконечного презрения, но знает, что должен её съесть.</i>
         """,
       ],
       vomit: """
@@ -147,7 +149,7 @@ config :mauricio,
     <i>Так как кормушка была переполнена, из неё вывалился недоеденный корм, а именно </i> <b><%= old_food %>.</b>
     """,
     feeder_content: """
-    <i>В кормушке сейчас <%= if length(all_food) == 1 do "лежит" else "ровными слоями лежат" end %></i> <b><%= Enum.join(all_food, ", ") %>.</b>
+    <i>В кормушке сейчас возвышаются груды еды. Среди них можно увидеть: <b><%= Enum.join(all_food, ", ") %>.</b>
     """,
     added_nothing: """
     <i><%= Member.full_name(who) %> только делает вид, что что-то добавляет в кормушку. В глазах <%= Cat.name_in(:genitive) %> недоумение и разочарование.</i>
