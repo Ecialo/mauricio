@@ -114,7 +114,7 @@ defmodule Mauricio.CatChat.Chat.Interaction do
       case String.split(rest, " ", trim: true) do
         [] -> :nothing
         [@cat_name] -> :self
-        actual_food -> actual_food |> Enum.join(" ") |> String.replace(@cat_name, "")
+        actual_food -> actual_food |> List.delete(@cat_name) |> Enum.join(" ")
       end
 
     add_to_feeder(feeder, food_to_add, who)
