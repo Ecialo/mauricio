@@ -56,6 +56,7 @@ defmodule Mauricio.MixProject do
       {:nadia, "~> 0.6.0"},
       {:jason, "~> 1.1"},
       {:mongodb_driver, "~> 0.7"},
+      {:floki, "~> 0.28.0"},
       {:bookish_spork, github: "tank-bohr/bookish_spork", only: :test},
       {:ex_parameterized, "~> 1.3.7", only: :test},
       {:dialyxir, "~> 1.0.0-rc.7", only: :dev, runtime: false},
