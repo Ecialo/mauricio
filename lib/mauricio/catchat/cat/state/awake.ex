@@ -94,7 +94,7 @@ defmodule Mauricio.CatChat.Cat.State.Awake do
     defdelegate pet(state, cat, who), to: Awake
     defdelegate hug(state, cat, who), to: State
     defdelegate mew(state, cat, who), to: Awake
-    def loud_sound_reaction(%Awake{}, _cat, _who), do: nil
+    def loud_sound_reaction(%Awake{}, _cat, _who, _triggers), do: nil
     defdelegate eat(state, cat, who), to: Awake
     defdelegate tire(state, cat, who), to: Awake
 
@@ -109,6 +109,5 @@ defmodule Mauricio.CatChat.Cat.State.Awake do
     defdelegate metabolic(state, cat, who), to: Awake
     defdelegate react_to_triggers(state, cat, who, triggers), to: State
     defdelegate hungry(state, cat, feeder), to: Awake
-    def dinner_call(%Awake{}, _cat, _who), do: nil
   end
 end

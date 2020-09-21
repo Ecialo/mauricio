@@ -32,7 +32,7 @@ defmodule Mauricio.CatChat.Cat.State.WantCare do
     defdelegate mew(state, cat, who), to: Awake
     defdelegate eat(state, cat, who), to: Awake
     defdelegate hungry(state, cat, feeder), to: Awake
-    def loud_sound_reaction(%WantCare{}, _cat, _who), do: nil
+    def loud_sound_reaction(%WantCare{}, _cat, _who, _triggers), do: nil
     defdelegate metabolic(state, cat, who), to: Awake
     defdelegate tire(state, cat, who), to: Awake
 
@@ -49,6 +49,5 @@ defmodule Mauricio.CatChat.Cat.State.WantCare do
       }
 
     defdelegate react_to_triggers(state, cat, who, triggers), to: State
-    def dinner_call(%WantCare{}, _cat, _who), do: nil
   end
 end

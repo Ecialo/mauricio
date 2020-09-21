@@ -31,13 +31,23 @@ defmodule MauricioTest.Cat.State.Sleep do
   end
 
   describe "loud_sound_reaction" do
-    test "wakes cat up and decreases user's karma", %{member: member, cat: cat} do
+    test "simple loud trigger wakes cat up and decreases user's karma", %{member: member, cat: cat} do
       expected = Text.get_all_texts(:aggressive, who: member, cat: cat)
-      {cat, new_member, text} = Cat.loud_sound_reaction(cat, member)
+      {cat, new_member, text} = Cat.loud_sound_reaction(cat, member, [:loud])
 
       assert Helpers.weak_text_eq(text, expected)
       assert cat.state == Awake.new()
       assert new_member.karma == member.karma - 1
+    end
+
+    test "loud trigger and eat trigger wake the cat up and increase user's karma, but don't feed the cat", %{member: member, cat: cat} do
+      expected = Text.get_text(:wake_up_dinner_call, cat: cat)
+      {new_cat, new_member, text} = Cat.loud_sound_reaction(cat, member, [:loud, :eat])
+
+      assert Helpers.weak_text_eq(text, expected)
+      assert new_cat.state == Awake.new()
+      assert new_cat.satiety == cat.satiety
+      assert new_member.karma == member.karma + 1
     end
   end
 
@@ -72,18 +82,6 @@ defmodule MauricioTest.Cat.State.Sleep do
       assert Helpers.weak_text_eq(text, expected)
       assert cat.state == Awake.new()
       assert cat.energy == cat.weight
-    end
-  end
-
-  describe "dinner_call" do
-    test "wakes the cat up and increases user's karma, but doesn't feed the cat", %{member: member, cat: cat} do
-      expected = Text.get_text(:wake_up_dinner_call, cat: cat)
-      {new_cat, new_member, text} = Cat.dinner_call(cat, member)
-
-      assert Helpers.weak_text_eq(text, expected)
-      assert new_cat.state == Awake.new()
-      assert new_cat.satiety == cat.satiety
-      assert new_member.karma == member.karma + 1
     end
   end
 end

@@ -40,10 +40,10 @@ defmodule MauricioTest.Cat.State.Away do
     end
   end
 
-  describe "dinner_call" do
-    test "returns cat home, but doesn't feed him", %{member: member, cat: cat} do
+  describe "loud_sound_reaction" do
+    test "loud trigger and eat trigger return cat home, but don't feed him", %{member: member, cat: cat} do
       expected = Text.get_text(:away_dinner_call, who: member, cat: cat)
-      {new_cat, _member, text} = Cat.dinner_call(cat, member)
+      {new_cat, _member, text} = Cat.loud_sound_reaction(cat, member, [:loud, :eat])
 
       assert Helpers.weak_text_eq(text, expected)
       assert new_cat.state == Awake.new()

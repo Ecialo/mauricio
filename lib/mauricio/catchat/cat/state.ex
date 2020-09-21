@@ -5,7 +5,7 @@ defprotocol Mauricio.CatChat.Cat.CatState do
 
   def mew(state, cat, who)
 
-  def loud_sound_reaction(state, cat, who)
+  def loud_sound_reaction(state, cat, who, triggers)
 
   def eat(state, cat, who)
 
@@ -16,8 +16,6 @@ defprotocol Mauricio.CatChat.Cat.CatState do
   def pine(state, cat, who)
 
   def metabolic(state, cat, who)
-
-  def dinner_call(state, cat, who)
 
   def react_to_triggers(state, cat, who, triggers)
 end
@@ -124,10 +122,7 @@ defmodule Mauricio.CatChat.Cat.State do
   end
 
   defp react_to_trigger(:loud, cat, who, triggers) do
-    cond do
-      :eat in triggers -> Cat.dinner_call(cat, who)
-      true -> Cat.loud_sound_reaction(cat, who)
-    end
+    Cat.loud_sound_reaction(cat, who, triggers)
   end
 
   defp react_to_trigger(tr, cat, who, _) when tr in [:cat, :dog] do

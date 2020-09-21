@@ -122,8 +122,8 @@ defmodule Mauricio.CatChat.Cat do
   end
 
   # Loud Sound
-  def loud_sound_reaction(%Cat{state: state} = cat, who) do
-    CatState.loud_sound_reaction(state, cat, who)
+  def loud_sound_reaction(%Cat{state: state} = cat, who, triggers) do
+    CatState.loud_sound_reaction(state, cat, who, triggers)
   end
 
   # Eat
@@ -151,10 +151,6 @@ defmodule Mauricio.CatChat.Cat do
   # Hungry
   def hungry(%Cat{state: state} = cat, feeder) do
     CatState.hungry(state, cat, feeder)
-  end
-
-  def dinner_call(%Cat{state: state} = cat, who) do
-    CatState.dinner_call(state, cat, who)
   end
 
   # React

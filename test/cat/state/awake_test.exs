@@ -65,7 +65,7 @@ defmodule MauricioTest.Cat.State.Awake do
 
   describe "loud_sound_reaction" do
     test "does nothing", %{who: who, cat: cat} do
-      assert nil == Cat.loud_sound_reaction(cat, who)
+      assert nil == Cat.loud_sound_reaction(cat, who, [:loud])
     end
   end
 
