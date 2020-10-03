@@ -5,7 +5,7 @@ defprotocol Mauricio.CatChat.Cat.CatState do
 
   def mew(state, cat, who)
 
-  def loud_sound_reaction(state, cat, who)
+  def loud_sound_reaction(state, cat, who, triggers)
 
   def eat(state, cat, who)
 
@@ -95,7 +95,7 @@ defmodule Mauricio.CatChat.Cat.State do
 
   def react_to_triggers(_state, cat, who, triggers) do
     collect = fn tr, {cat, who, msgs} ->
-      case react_to_trigger(tr, cat, who) do
+      case react_to_trigger(tr, cat, who, triggers) do
         nil -> {cat, who, msgs}
         {cat, nil, msg} -> {cat, who, [msg | msgs]}
         {cat, who, msg} -> {cat, who, [msg | msgs]}
@@ -107,25 +107,25 @@ defmodule Mauricio.CatChat.Cat.State do
     {cat, who, Enum.reverse(msgs)}
   end
 
-  defp react_to_trigger(:attract, _, _), do: nil
+  defp react_to_trigger(:attract, _, _, _), do: nil
 
-  defp react_to_trigger(:banish, cat, who) do
+  defp react_to_trigger(:banish, cat, who, _) do
     {cat, %{who | participant?: false}, Text.get_text(:banished, cat: cat, who: who)}
   end
 
-  defp react_to_trigger(:eat, cat, who) do
+  defp react_to_trigger(:eat, cat, who, _) do
     Cat.eat(cat, who)
   end
 
-  defp react_to_trigger(:mew, cat, who) do
+  defp react_to_trigger(:mew, cat, who, _) do
     Cat.mew(cat, who)
   end
 
-  defp react_to_trigger(:loud, cat, who) do
-    Cat.loud_sound_reaction(cat, who)
+  defp react_to_trigger(:loud, cat, who, triggers) do
+    Cat.loud_sound_reaction(cat, who, triggers)
   end
 
-  defp react_to_trigger(tr, cat, who) when tr in [:cat, :dog] do
+  defp react_to_trigger(tr, cat, who, _) when tr in [:cat, :dog] do
     {cat, who, tr}
   end
 end

@@ -25,10 +25,15 @@ defmodule Mauricio.CatChat.Cat.State.Sleep do
     def mew(%Sleep{}, cat, who),
       do: {cat, nil, Text.get_text(:sleep, cat: cat, who: who)}
 
-    def loud_sound_reaction(%Sleep{}, cat, who),
-      do:
+    def loud_sound_reaction(%Sleep{}, cat, who, triggers) do
+      if :eat in triggers do
+        {%{cat | state: Awake.new()}, Member.change_karma(who, :inc),
+         Text.get_text(:wake_up_dinner_call, cat: cat)}
+      else
         {%{cat | state: Awake.new()}, Member.change_karma(who, :dec),
          Text.get_text(:aggressive, cat: cat, who: who)}
+      end
+    end
 
     def tire(
           %Sleep{},
