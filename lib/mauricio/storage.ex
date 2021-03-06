@@ -1,5 +1,6 @@
 defmodule Mauricio.Storage do
-  alias Mauricio.CatChat.Chat
+  alias Mauricio.CatChat.{Chat, Cat}
+  alias Mauricio.News
   alias __MODULE__, as: Storage
 
   @name Storage
@@ -118,6 +119,16 @@ defmodule Mauricio.Storage do
 
   def pop(chat_id, storage \\ Storage) do
     GenServer.cast(storage, {:pop, chat_id})
+  end
+
+  def put_headlines(headliners, storage \\ Storage) do
+    GenServer.cast(storage, {:put_headliners, headliners})
+  end
+
+  @spec get_headline(News.news_source(), Cat.news_track(), GenServer.server()) ::
+          {Cat.news_track(), News.headline()}
+  def get_headline(type, track, storage \\ Storage) do
+    GenServer.call(storage, {:get_headliner, type, track})
   end
 
   def save(_), do: :ok

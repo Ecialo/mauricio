@@ -5,6 +5,10 @@ defmodule Mauricio.CatChat.Cat do
   alias Mauricio.Text
   alias Mauricio.Storage.Serializable
 
+  @typedoc """
+  {last_seen, backlog_newest, backlog_oldest}
+  """
+  @type news_track() :: {DateTime.t(), DateTime.t(), DateTime.t()}
   @type t() :: %Cat{
           name: String.t(),
           state: CatState.t(),
@@ -13,7 +17,8 @@ defmodule Mauricio.CatChat.Cat do
           times_pet: non_neg_integer(),
           laziness: 1..1024,
           energy: non_neg_integer(),
-          reqs: 0..10
+          reqs: 0..10,
+          # news: %{}
         }
 
   @derive [Serializable]

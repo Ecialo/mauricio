@@ -14,7 +14,8 @@ defmodule Mauricio.News.Adapter.Panorama do
   @datetime "datetime"
   @news_block "Лента новостей"
 
-  def extract(url, opts) do
+  def extract(opts) do
+    url = opts[:url]
   end
 
   def transform(doc) do

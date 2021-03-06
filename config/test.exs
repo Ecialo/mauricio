@@ -39,3 +39,5 @@ config :mauricio,
       "меховой цветок"
     ]
   }
+
+# config :mauricio, Mauricio.News,
