@@ -66,7 +66,8 @@ defmodule Mauricio.MixProject do
       {:propcheck, "~> 1.1", only: [:test, :dev]},
       {:ex_doc, "~> 0.21.3", dev: true, runtime: false},
       {:credo, "~> 1.4.0", only: :dev, runtime: false},
-      {:benchee, "~> 1.0.1", only: :dev}
+      {:benchee, "~> 1.0.1", only: :dev},
+      {:timex, "~> 3.6.4"}
     ]
   end
 end

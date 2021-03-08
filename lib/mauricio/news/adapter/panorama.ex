@@ -1,18 +1,11 @@
 defmodule Mauricio.News.Adapter.Panorama do
   @behaviour Mauricio.News.Adapter
 
-  @news_selector "div.np-recent-posts-wrapper"
-  @content_selector "div.np-post-content"
-  @time_selector "div.np-post-meta span a time.published"
-  @href_selector "h3 a"
-
+  @news_selector "div.news.big-previews, div.news.medium-previews, div.news.small-previews"
   @div "div"
   @a "a"
-  @h4 "h4"
-  @ul "ul"
-  @time "time"
-  @datetime "datetime"
-  @news_block "Лента новостей"
+  @href "href"
+  @headline_selector "div h3"
 
   def extract(opts) do
     url = opts[:url]
@@ -23,25 +16,28 @@ defmodule Mauricio.News.Adapter.Panorama do
     |> collect()
   end
 
-  def collect([
-        {@div, _clases,
-         [
-           {@h4, _, [@news_block]},
-           {@ul, _, posts}
-         ]}
-      ]) do
-    Enum.map(posts, &extract_post/1)
+  def collect(blocks) do
+    do_collect(blocks, [])
   end
 
-  def extract_post(post_struct) do
-    content = Floki.find(post_struct, @content_selector)
-    href = Floki.find(content, @href_selector)
-    time = Floki.find(content, @time_selector)
+  defp do_collect([], result),
+    do:
+      result
+      |> Enum.uniq_by(fn {_, link} -> link end)
+      |> Enum.with_index()
+      |> Enum.map(fn {{headline, link}, index} ->
+        {Timex.now() |> Timex.shift(minutes: -index), headline, link}
+      end)
 
-    [{@a, [{_, link}], [headline]}] = href
-    [{@time, [_class, {@datetime, dt}], _}] = time
+  defp do_collect([block | tail], result) do
+    {@div, _, block_posts} = block
+    parsed_posts = block_posts |> Enum.map(&parse/1)
+    do_collect(tail, result ++ parsed_posts)
+  end
 
-    {dt, headline, link}
-    # nil
+  defp parse(post) do
+    {@a, [{@href, link}, _, _], _} = post
+    [{_, _, [headline]}] = Floki.find(post, @headline_selector)
+    {headline, link}
   end
 end
