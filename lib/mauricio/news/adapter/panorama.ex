@@ -6,6 +6,7 @@ defmodule Mauricio.News.Adapter.Panorama do
   @a "a"
   @href "href"
   @headline_selector "div h3"
+  @panorama_url "https://panorama.pub"
 
   def extract(opts) do
     url = opts[:url]
@@ -38,6 +39,6 @@ defmodule Mauricio.News.Adapter.Panorama do
   defp parse(post) do
     {@a, [{@href, link}, _, _], _} = post
     [{_, _, [headline]}] = Floki.find(post, @headline_selector)
-    {headline, link}
+    {headline, Path.join(@panorama_url, link)}
   end
 end
