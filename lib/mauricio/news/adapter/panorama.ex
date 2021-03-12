@@ -8,16 +8,14 @@ defmodule Mauricio.News.Adapter.Panorama do
   @headline_selector "div h3"
   @panorama_url "https://panorama.pub"
 
-  def extract(opts) do
-    url = opts[:url]
-  end
+  def extract(_opts), do: HTTPoison.get(@panorama_url) |> transform()
 
   def transform(doc) do
     Floki.find(doc, @news_selector)
     |> collect()
   end
 
-  def collect(blocks) do
+  defp collect(blocks) do
     do_collect(blocks, [])
   end
 
