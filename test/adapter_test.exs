@@ -1,8 +1,9 @@
 defmodule MauricioTest.Adapter do
   use ExUnit.Case
   alias Mauricio.News.Adapter.Panorama
+  alias Mauricio.News.Adapter.Telegram
 
-  test "panorama transfrom" do
+  test "panorama transform" do
     f = File.read!("test/test_data/panorama.html")
     {:ok, doc} = Floki.parse_document(f)
 
@@ -72,5 +73,62 @@ defmodule MauricioTest.Adapter do
               "Вася Обломов не смог стать почётным гражданином Магаданской области из-за отсутствия судимости",
               "https://panorama.pub/news/vasya-oblomov-ne-smog-stat-pochyotnym-grazhdaninom-magadanskoj-oblasti-iz-za-otsutstviya-sudimosti"}
            ] = Panorama.transform(doc)
+  end
+
+  test "telegram transform" do
+    f = File.read!("test/test_data/telegram.html")
+    {:ok, doc} = Floki.parse_document(f)
+
+    assert [
+             {~U[2021-03-12 06:00:01Z], "В Приморье пьяная ёлка снова подожгла людей",
+              "https://t.me/neuralmeduza/1216"},
+             {~U[2021-03-12 07:00:01Z], "РЖД переоформляет пассажиров в пианистов",
+              "https://t.me/neuralmeduza/1217"},
+             {~U[2021-03-12 08:00:02Z],
+              "В России начали выдавать гробы, чтобы предотвратить теракты и убийства",
+              "https://t.me/neuralmeduza/1218"},
+             {~U[2021-03-12 09:00:01Z], "В Севастополе обнаружен ген троллейбуса",
+              "https://t.me/neuralmeduza/1219"},
+             {~U[2021-03-12 10:00:01Z], "Мосгорсуд решил обязать москвичей допивать пиво",
+              "https://t.me/neuralmeduza/1220"},
+             {~U[2021-03-12 11:00:01Z], "ЦИК попросил жителей Крымска сделать им минет",
+              "https://t.me/neuralmeduza/1221"},
+             {~U[2021-03-12 12:00:01Z],
+              "Власти Симферополя предложили увеличить срок жизни портретами Кадырова",
+              "https://t.me/neuralmeduza/1222"},
+             {~U[2021-03-12 13:00:02Z], "МТС запустит мемы для борьбы с госслужащими",
+              "https://t.me/neuralmeduza/1223"},
+             {~U[2021-03-12 14:00:01Z],
+              "В Дагестане открылся комбинат по производству афоризмов и песен",
+              "https://t.me/neuralmeduza/1224"},
+             {~U[2021-03-12 15:00:02Z],
+              "Путин поручил правительству создать единую электронную карту вымирания",
+              "https://t.me/neuralmeduza/1225"},
+             {~U[2021-03-12 16:00:01Z],
+              "Патриарх Кирилл объявил о начале «кровавого воскресения» в Москве",
+              "https://t.me/neuralmeduza/1226"},
+             {~U[2021-03-12 17:00:01Z], "Путин уволил курсор", "https://t.me/neuralmeduza/1227"},
+             {~U[2021-03-12 18:00:01Z],
+              "Роботы-собаки Федора Конюхова подарили бездомному волгоградцу нож",
+              "https://t.me/neuralmeduza/1228"},
+             {~U[2021-03-12 19:00:02Z],
+              "Винни-Пух занял второе место на выборах президента России",
+              "https://t.me/neuralmeduza/1229"},
+             {~U[2021-03-13 07:00:02Z], "В Архангельской области нашли новую кожу Путина",
+              "https://t.me/neuralmeduza/1230"},
+             {~U[2021-03-13 08:00:02Z], "В США разработали гиперзвуковую бомбу в стиле рэп",
+              "https://t.me/neuralmeduza/1231"},
+             {~U[2021-03-13 09:00:01Z], "МТС запустит отечественный аналог COVID-19",
+              "https://t.me/neuralmeduza/1232"},
+             {~U[2021-03-13 10:00:01Z],
+              "Коммунальные службы Подмосковья приняли решение приравнять москвичей к голубям",
+              "https://t.me/neuralmeduza/1233"},
+             {~U[2021-03-13 11:00:01Z],
+              "Студенты Самарского госуниверситета подрались с реальностью",
+              "https://t.me/neuralmeduza/1234"},
+             {~U[2021-03-13 12:00:01Z],
+              "МВД предложило ввести уголовную ответственность за административную ответственность",
+              "https://t.me/neuralmeduza/1235"}
+           ] = Telegram.transform(doc)
   end
 end
