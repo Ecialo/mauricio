@@ -1,4 +1,10 @@
 import Config
+alias Mauricio.News.Adapter
+
+config :mauricio, Mauricio.Scheduler,
+  jobs: [
+    # {"* */4 * * *", {Mauricio.News, :collect, [Adapter.Panorama, [url: "lololo"]]}}
+  ]
 
 config :mauricio,
   max_karma: 10,
@@ -100,16 +106,17 @@ config :mauricio,
       "Хр-Хр-Хр",
       "ХРРРРРРРРРР!",
       "Хрррхррвап...",
-      "ХррХррр",
+      "ХррХррр"
     ],
-    wake_up_lazy: "<i><%= Cat.capitalized_name_in(:nominative, cat.name) %> проснулся, но только для того, чтобы пожрать.</i>",
+    wake_up_lazy:
+      "<i><%= Cat.capitalized_name_in(:nominative, cat.name) %> проснулся, но только для того, чтобы пожрать.</i>",
     wake_up_active:
       "<i><%= Cat.capitalized_name_in(:nominative, cat.name) %> проснулся, потянулся и снова готов носиться по комнате.</i>",
     satiety: %{
       0 => [
         "ОМНОМНОМНОМНОМНОМНОМ!!!",
         "<i><%= Cat.capitalized_name_in(:nominative, cat.name) %> заточил всю еду в мгновение ока.</i>",
-        "<i><%= Cat.capitalized_name_in(:nominative, cat.name) %> слопал еду!</i>",
+        "<i><%= Cat.capitalized_name_in(:nominative, cat.name) %> слопал еду!</i>"
       ],
       1 => [
         "<i>Громко мурча и чавкая, <%= Cat.name_in(:nominative) %> уплетает свою еду.</i>",
@@ -126,8 +133,10 @@ config :mauricio,
       4 => "Чавк-чавк-чавк!",
       5 => "<i><i><%= Cat.capitalized_name_in(:nominative, cat.name) %> хорошо перекусил.</i>",
       6 => "<i><%= Cat.capitalized_name_in(:nominative, cat.name) %> поел.</i>",
-      7 => "<i><%= Cat.capitalized_name_in(:nominative, cat.name) %> все еще делает вид, что ему вкусно.</i>",
-      8 => "<i><%= Cat.capitalized_name_in(:nominative, cat.name) %> без особого энтузиазма съедает свой корм.</i>",
+      7 =>
+        "<i><%= Cat.capitalized_name_in(:nominative, cat.name) %> все еще делает вид, что ему вкусно.</i>",
+      8 =>
+        "<i><%= Cat.capitalized_name_in(:nominative, cat.name) %> без особого энтузиазма съедает свой корм.</i>",
       9 => "<i>В <%= Cat.name_in(:accusative) %> едва лезет!</i>",
       10 => [
         """
@@ -135,7 +144,7 @@ config :mauricio,
         """,
         """
         <i><%= Cat.capitalized_name_in(:nominative, cat.name) %> смотрит на еду тяжелым взглядом, полным бесконечного презрения, но знает, что должен её съесть.</i>
-        """,
+        """
       ],
       vomit: """
       <i><%= Cat.capitalized_name_in(:nominative, cat.name) %> съел слишком много, и его стошнило. <%= if not is_atom(who) do Member.full_name(who) <> ", это твоя вина!" else "В этом явно виноват только он сам." end %></i>
@@ -214,7 +223,7 @@ config :mauricio,
       128 => "немного ленив.",
       256 => "весьма ленив.",
       512 => "очень ленив!",
-      1024 => "фантастически ленив!",
+      1024 => "фантастически ленив!"
     },
     help: """
     Это котик в телеграме! Кормите, гладьте и обнимайте его! Окутайте его любовью, и он ответит вам взаимностью.

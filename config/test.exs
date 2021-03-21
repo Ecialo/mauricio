@@ -1,9 +1,14 @@
 import Config
+alias Mauricio.News.Adapter
 
 config :nadia,
   base_url: "http://localhost:32002/"
 
 config :mauricio,
+  news: %{
+    # adapter module, url, opts, q size, fetch period
+    panorama: {Adapter.Panorama, "", [], 8, 60 * 60 * 4}
+  },
   storage: [
     type: :mongo,
     url:
@@ -34,3 +39,5 @@ config :mauricio,
       "меховой цветок"
     ]
   }
+
+# config :mauricio, Mauricio.News,

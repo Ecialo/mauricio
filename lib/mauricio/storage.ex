@@ -1,17 +1,23 @@
 defmodule Mauricio.Storage do
-  alias Mauricio.CatChat.Chat
+  alias Mauricio.CatChat.{Chat, Cat}
+  alias Mauricio.News
   alias __MODULE__, as: Storage
 
   @name Storage
 
   @type fetch_reply(s) :: {:reply, {:ok, Chat.t()} | :error, s}
+  @type headline_reply(s) :: {:reply, {:ok, {Cat.news_track(), News.headline()}}, s}
   @type status_reply(s) :: {:reply, :ok | :error, s}
   @type noreply(s) :: {:noreply, s}
   @type all_ids_reply(s) :: {:reply, [Chat.chat_id()], s}
 
   @callback handle_get_all_ids(GenServer.from(), any()) :: all_ids_reply(any())
   @callback handle_fetch(Chat.chat_id(), GenServer.from(), any()) :: fetch_reply(any())
+  @callback handle_get_headline({News.news_source(), Cat.news_track()}, GenServer.from(), any()) ::
+              headline_reply(any)
   @callback handle_put(Chat.t(), GenServer.from(), any()) :: status_reply(any())
+  @callback handle_put_headlines([News.tagged_headline()], any()) ::
+              noreply(any())
   @callback handle_flush(GenServer.from(), any()) :: status_reply(any())
   @callback handle_pop(Chat.chat_id(), GenServer.from(), any()) :: status_reply(any())
   @callback handle_save(Chat.chat_id(), GenServer.from(), any()) :: status_reply(any())
@@ -33,6 +39,7 @@ defmodule Mauricio.Storage do
 
       @type all_ids_reply() :: BaseStorage.all_ids_reply(storage())
       @type fetch_reply() :: BaseStorage.fetch_reply(storage())
+      @type headline_reply() :: BaseStorage.headline_reply(storage())
       @type status_reply() :: BaseStorage.status_reply(storage())
       @type noreply() :: BaseStorage.noreply(storage())
 
@@ -46,6 +53,10 @@ defmodule Mauricio.Storage do
 
       def handle_call({:put, chat}, from, storage) do
         handle_put(chat, from, storage)
+      end
+
+      def handle_call({:get_headline, type, track}, from, storage) do
+        handle_get_headline(type, track, storage)
       end
 
       def handle_call(:flush, from, storage) do
@@ -62,6 +73,10 @@ defmodule Mauricio.Storage do
 
       def handle_cast({:put, chat}, storage) do
         handle_put_async(chat, storage)
+      end
+
+      def handle_cast({:put_headlines, headlines}, storage) do
+        handle_put_headlines(headlines, storage)
       end
 
       def handle_cast({:pop, chat_id}, storage) do
@@ -120,5 +135,17 @@ defmodule Mauricio.Storage do
     GenServer.cast(storage, {:pop, chat_id})
   end
 
+  def put_headlines(headlines, storage \\ Storage) do
+    GenServer.cast(storage, {:put_headlines, headlines})
+  end
+
+  @spec get_headline({News.news_source(), Cat.news_track()}, GenServer.server()) ::
+          {Cat.news_track(), News.headline()}
+  def get_headline(type, track, storage \\ Storage) do
+    GenServer.call(storage, {:get_headline, type, track})
+  end
+
   def save(_), do: :ok
+
+  def encode_news_source(:panorama), do: 0
 end

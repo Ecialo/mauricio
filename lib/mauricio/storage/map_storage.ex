@@ -46,4 +46,9 @@ defmodule Mauricio.Storage.MapStorage do
     {:reply, :ok, storage}
   end
 
+  def handle_put_headlines(headlines, storage) do
+  end
+
+  def handle_get_headline(type, track, storage) do
+  end
 end
