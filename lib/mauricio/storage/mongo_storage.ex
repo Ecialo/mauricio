@@ -1,10 +1,15 @@
 defmodule Mauricio.Storage.MongoStorage do
+  use Bitwise
   use Mauricio.Storage
   alias Mauricio.Storage.{Serializable, Decoder}
   alias __MODULE__, as: Storage
 
   @type storage() :: pid()
   @coll "chats"
+  @news "news"
+  @devil_seed 666
+  # 2 ** 64 - 1, last 64 bit
+  @mask 18_446_744_073_709_551_615
 
   def init(opts) do
     Mongo.start_link(opts)
@@ -59,5 +64,115 @@ defmodule Mauricio.Storage.MongoStorage do
   @spec handle_save(Chat.chat_id(), GenServer.from(), storage()) :: status_reply()
   def handle_save(_chat_id, _from, storage) do
     {:reply, :ok, storage}
+  end
+
+  def handle_put_headlines(tagged_headlines, storage) do
+    headlines = Enum.map(tagged_headlines, &repack/1)
+
+    Mongo.insert_many(storage, @news, headlines, ordered: false)
+    |> IO.inspect()
+
+    # Mongo.update_many(storage, @news,
+    # )
+
+    {:noreply, storage}
+  end
+
+  def handle_get_headline(type, {last, backlog_n, backlog_o} = track, storage) do
+    type = BaseStorage.encode_news_source(type)
+    # match_type_stage = %{"$match" => %{"source" => %{"$eq" => type}}}
+    # latest = %{}
+
+    get_last = fn ->
+      Mongo.find_one(
+        storage,
+        @news,
+        %{"source" => %{"$eq" => type}, "posted_at" => %{"$gt" => last}},
+        sort: %{"posted_at" => -1}
+      )
+      |> case do
+        nil ->
+          nil
+
+        doc ->
+          {important_parts(doc), {doc["posted_at"], backlog_n, backlog_o}}
+      end
+    end
+
+    extend_backlog_up = fn ->
+      Mongo.find_one(
+        storage,
+        @news,
+        %{
+          "source" => %{"$eq" => type},
+          "posted_at" => %{
+            "$gt" => backlog_n,
+            "$lt" => last
+          }
+        },
+        sort: %{"posted_at" => 1}
+      )
+      |> case do
+        nil ->
+          nil
+
+        doc ->
+          {important_parts(doc), {last, doc["posted_at"], backlog_o}}
+      end
+    end
+
+    extend_backlog_down = fn ->
+      Mongo.find_one(
+        storage,
+        @news,
+        %{
+          "source" => %{"$eq" => type},
+          "posted_at" => %{
+            "$lt" => backlog_o
+          }
+        },
+        sort: %{"posted_at" => -1}
+      )
+      |> case do
+        nil ->
+          nil
+
+        doc ->
+          {important_parts(doc), {last, backlog_n, doc["posted_at"]}}
+      end
+    end
+
+    with(
+      nil <- get_last.(),
+      nil <- extend_backlog_down.(),
+      nil <- extend_backlog_up.()
+    ) do
+      {empty_news(), track}
+    else
+      {_news, _track} = r -> r
+    end
+  end
+
+  defp empty_news do
+    {"наступает холодная, пугающая пустота.", nil}
+  end
+
+  defp important_parts(news) do
+    {news["content"], news["link"]}
+  end
+
+  defp repack({news_source, {posted_at, content, link}}) do
+    id =
+      content
+      |> Murmur.hash_x64_128(@devil_seed)
+      |> bxor(@mask)
+
+    %{
+      "_id" => id,
+      "source" => BaseStorage.encode_news_source(news_source),
+      "content" => content,
+      "posted_at" => posted_at,
+      "link" => link
+    }
   end
 end

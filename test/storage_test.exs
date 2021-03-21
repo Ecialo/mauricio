@@ -27,4 +27,7 @@ defmodule MauricioTest.Storage do
     CatChat.process_update(Helpers.stop_update())
     assert Storage.fetch(1) == :error
   end
+
+  test "put get headlines" do
+  end
 end
