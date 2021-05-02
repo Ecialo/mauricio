@@ -1,15 +1,16 @@
 defmodule Mauricio.Storage.MongoStorage do
   use Bitwise
   use Mauricio.Storage
+
   alias Mauricio.Storage.{Serializable, Decoder}
   alias __MODULE__, as: Storage
 
   @type storage() :: pid()
   @coll "chats"
   @news "news"
+
   @devil_seed 666
-  # 2 ** 64 - 1, last 64 bit
-  @mask 18_446_744_073_709_551_615
+  @mask String.duplicate(<<255>>, 12) |> :binary.decode_unsigned()
 
   def init(opts) do
     Mongo.start_link(opts)
@@ -79,6 +80,7 @@ defmodule Mauricio.Storage.MongoStorage do
   end
 
   def handle_get_headline(type, {last, backlog_n, backlog_o} = track, storage) do
+    IO.inspect("GET")
     type = BaseStorage.encode_news_source(type)
     # match_type_stage = %{"$match" => %{"source" => %{"$eq" => type}}}
     # latest = %{}
@@ -142,15 +144,22 @@ defmodule Mauricio.Storage.MongoStorage do
       end
     end
 
-    with(
-      nil <- get_last.(),
-      nil <- extend_backlog_down.(),
-      nil <- extend_backlog_up.()
-    ) do
-      {empty_news(), track}
-    else
-      {_news, _track} = r -> r
-    end
+    track =
+      get_last.() ||
+        extend_backlog_up.() ||
+        extend_backlog_down.() ||
+        {empty_news(), track}
+
+    {:reply, track, storage}
+    # with(
+    #   nil <- get_last.(),
+    #   nil <- extend_backlog_down.(),
+    #   nil <- extend_backlog_up.()
+    # ) do
+    #   {empty_news(), track}
+    # else
+    #   {_news, _track} = r -> r
+    # end
   end
 
   defp empty_news do
@@ -162,13 +171,15 @@ defmodule Mauricio.Storage.MongoStorage do
   end
 
   defp repack({news_source, {posted_at, content, link}}) do
+    # id = BaseStorage.make_id(content)
     id =
       content
       |> Murmur.hash_x64_128(@devil_seed)
-      |> bxor(@mask)
+      |> band(@mask)
+      |> :binary.encode_unsigned()
 
     %{
-      "_id" => id,
+      "_id" => %BSON.ObjectId{value: id},
       "source" => BaseStorage.encode_news_source(news_source),
       "content" => content,
       "posted_at" => posted_at,

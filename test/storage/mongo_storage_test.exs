@@ -38,9 +38,9 @@ defmodule MauricioTest.Storage.MongoStorage do
 
     chats =
       [some_chat.(), some_chat.(), some_chat.(), some_chat.(), some_chat.()]
-      |> Enum.uniq_by(&(&1.chat_id))
+      |> Enum.uniq_by(& &1.chat_id)
 
-    chat_ids = MapSet.new(chats, &(&1.chat_id))
+    chat_ids = MapSet.new(chats, & &1.chat_id)
 
     Enum.each(chats, &Storage.put/1)
     retrieved_chat_ids = Storage.get_all_ids() |> MapSet.new()
@@ -66,5 +66,17 @@ defmodule MauricioTest.Storage.MongoStorage do
     {:ok, fetched_chat} = Storage.fetch(chat_id)
 
     assert fetched_chat == new_old_chat
+  end
+
+  test "news put get happy" do
+  end
+
+  test "news put dublicates" do
+  end
+
+  test "news put get backlog up" do
+  end
+
+  test "news put get backlog down" do
   end
 end

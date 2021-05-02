@@ -1,4 +1,6 @@
 defmodule Mauricio.Storage do
+  use Bitwise
+
   alias Mauricio.CatChat.{Chat, Cat}
   alias Mauricio.News
   alias __MODULE__, as: Storage
@@ -148,4 +150,10 @@ defmodule Mauricio.Storage do
   def save(_), do: :ok
 
   def encode_news_source(:panorama), do: 0
+
+  # def make_id(v) do
+  #   v
+  #   |> Murmur.hash_x64_128(@devil_seed)
+  #   |> band(@mask)
+  # end
 end

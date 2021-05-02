@@ -4,6 +4,11 @@ defmodule MauricioTest.Storage do
   alias Mauricio.{Storage, CatChat}
   alias MauricioTest.Helpers
 
+  def sigil_t(ts, _opts) do
+    String.to_integer(ts)
+    |> DateTime.from_unix!()
+  end
+
   setup do
     {:ok, _} = :bookish_spork.start_server()
     on_exit(&:bookish_spork.stop_server/0)
@@ -28,6 +33,19 @@ defmodule MauricioTest.Storage do
     assert Storage.fetch(1) == :error
   end
 
-  test "put get headlines" do
+  describe "headlines" do
+    test "put-get" do
+      headline = {~t(100), "aaa", "bbb"}
+      tagged_headline = {:panorama, headline}
+
+      time_track = {~t(99), ~t(50), ~t(50)}
+
+      Storage.put_headlines([tagged_headline])
+      Process.sleep(100)
+      r = Storage.get_headline(:panorama, time_track)
+      IO.inspect(r, label: "huyak")
+
+      assert false
+    end
   end
 end
