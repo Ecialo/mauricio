@@ -57,6 +57,10 @@ defmodule Mauricio.Storage do
         handle_put(chat, from, storage)
       end
 
+      def handle_call({:put_headlines, headlines}, from, storage) do
+        handle_put_headlines(headlines, from, storage)
+      end
+
       def handle_call({:get_headline, type, track}, from, storage) do
         handle_get_headline(type, track, storage)
       end
@@ -78,7 +82,8 @@ defmodule Mauricio.Storage do
       end
 
       def handle_cast({:put_headlines, headlines}, storage) do
-        handle_put_headlines(headlines, storage)
+        {:reply, :ok, ns} = handle_put_headlines(headlines, from_self(), storage)
+        {:noreply, ns}
       end
 
       def handle_cast({:pop, chat_id}, storage) do
@@ -138,6 +143,10 @@ defmodule Mauricio.Storage do
   end
 
   def put_headlines(headlines, storage \\ Storage) do
+    GenServer.call(storage, {:put_headlines, headlines})
+  end
+
+  def put_headlines_async(headlines, storage \\ Storage) do
     GenServer.cast(storage, {:put_headlines, headlines})
   end
 
@@ -150,6 +159,7 @@ defmodule Mauricio.Storage do
   def save(_), do: :ok
 
   def encode_news_source(:panorama), do: 0
+  def encode_news_source(:neuromeduza), do: 1
 
   # def make_id(v) do
   #   v

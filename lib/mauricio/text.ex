@@ -12,7 +12,9 @@ defmodule Mauricio.Text do
   Evaluate a template with the aid of custom functions.
   """
   def rich_eval(source, bindings) do
-    EEx.eval_string(source, bindings, aliases: [{Member, Mauricio.CatChat.Member}, {Cat, Mauricio.Text.Cat}])
+    EEx.eval_string(source, bindings,
+      aliases: [{Member, Mauricio.CatChat.Member}, {Cat, Mauricio.Text.Cat}]
+    )
   end
 
   def get_text(key, opts \\ []) do
@@ -37,7 +39,7 @@ defmodule Mauricio.Text do
   end
 
   def get_template([key | rest]), do: get_template(get_template(key), rest)
-  def get_template(key), do: Application.get_env(:mauricio, :text)[key]
+  def get_template(key), do: Application.get_env(:mauricio, Mauricio.Text)[key]
   def get_template(template, []), do: template
 
   def get_template(template, [key | rest]) when is_map(template),

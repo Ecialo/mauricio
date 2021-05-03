@@ -5,8 +5,18 @@ defmodule MauricioTest.Storage do
   alias MauricioTest.Helpers
 
   def sigil_t(ts, _opts) do
-    String.to_integer(ts)
-    |> DateTime.from_unix!()
+    ts
+    |> String.to_integer()
+    |> Kernel.*(1000)
+    |> DateTime.from_unix!(:millisecond)
+  end
+
+  def tag_all_with(headlines, tag) do
+    Enum.map(headlines, &{tag, &1})
+  end
+
+  def default_time_track do
+    {~t(990), ~t(500), ~t(500)}
   end
 
   setup do
@@ -35,17 +45,139 @@ defmodule MauricioTest.Storage do
 
   describe "headlines" do
     test "put-get" do
-      headline = {~t(100), "aaa", "bbb"}
+      headline = {~t(1000), "aaa", "bbb"}
       tagged_headline = {:panorama, headline}
 
-      time_track = {~t(99), ~t(50), ~t(50)}
+      time_track = default_time_track()
 
       Storage.put_headlines([tagged_headline])
-      Process.sleep(100)
-      r = Storage.get_headline(:panorama, time_track)
-      IO.inspect(r, label: "huyak")
+      {headline, new_track} = Storage.get_headline(:panorama, time_track)
 
-      assert false
+      assert headline == {"aaa", "bbb"}
+      assert new_track == {~t(1000), ~t(500), ~t(500)}
+    end
+
+    test "put same twice" do
+      headlines =
+        [
+          {~t(1000), "1", "1"}
+        ]
+        |> tag_all_with(:panorama)
+
+      new_headlines =
+        [
+          {~t(1500), "1", "1"},
+          {~t(1400), "4", "4"}
+        ]
+        |> tag_all_with(:panorama)
+
+      time_track = default_time_track()
+
+      Storage.put_headlines(headlines)
+      Storage.put_headlines(new_headlines)
+
+      {headline, new_track} = Storage.get_headline(:panorama, time_track)
+
+      assert headline == {"4", "4"}
+      assert new_track == {~t(1400), ~t(500), ~t(500)}
+    end
+
+    test "different topics does not affect each other" do
+      panorama_headlines =
+        [
+          {~t(1000), "1", "1"}
+        ]
+        |> tag_all_with(:panorama)
+
+      neuromeduza_headlines =
+        [
+          {~t(1500), "2", "2"}
+        ]
+        |> tag_all_with(:neuromeduza)
+
+      time_track = default_time_track()
+
+      Storage.put_headlines(panorama_headlines)
+      Storage.put_headlines(neuromeduza_headlines)
+
+      {headline, new_track} = Storage.get_headline(:panorama, time_track)
+      assert headline == {"1", "1"}
+      assert new_track == {~t(1000), ~t(500), ~t(500)}
+
+      {headline, new_track} = Storage.get_headline(:neuromeduza, time_track)
+      assert headline == {"2", "2"}
+      assert new_track == {~t(1500), ~t(500), ~t(500)}
+    end
+
+    test "most latest" do
+      panorama_headlines =
+        [
+          {~t(1000), "1", "1"},
+          {~t(990), "2", "2"}
+        ]
+        |> tag_all_with(:panorama)
+
+      time_track = {~t(500), ~t(500), ~t(500)}
+
+      Storage.put_headlines(panorama_headlines)
+
+      {headline, new_track} = Storage.get_headline(:panorama, time_track)
+      assert headline == {"1", "1"}
+      assert new_track == {~t(1000), ~t(500), ~t(500)}
+    end
+
+    test "extend backlog up" do
+      panorama_headlines =
+        [
+          {~t(1000), "1", "1"},
+          {~t(990), "2", "2"},
+          {~t(400), "3", "3"}
+        ]
+        |> tag_all_with(:panorama)
+
+      time_track = {~t(1000), ~t(500), ~t(500)}
+
+      Storage.put_headlines(panorama_headlines)
+
+      {headline, new_track} = Storage.get_headline(:panorama, time_track)
+      assert headline == {"2", "2"}
+      assert new_track == {~t(1000), ~t(990), ~t(500)}
+    end
+
+    test "extend backlog down" do
+      panorama_headlines =
+        [
+          {~t(1000), "1", "1"},
+          {~t(990), "2", "2"},
+          {~t(400), "3", "3"}
+        ]
+        |> tag_all_with(:panorama)
+
+      time_track = {~t(1000), ~t(990), ~t(500)}
+
+      Storage.put_headlines(panorama_headlines)
+
+      {headline, new_track} = Storage.get_headline(:panorama, time_track)
+      assert headline == {"3", "3"}
+      assert new_track == {~t(1000), ~t(990), ~t(400)}
+    end
+
+    test "no news" do
+      panorama_headlines =
+        [
+          {~t(1000), "1", "1"},
+          {~t(990), "2", "2"},
+          {~t(400), "3", "3"}
+        ]
+        |> tag_all_with(:panorama)
+
+      time_track = {~t(1000), ~t(990), ~t(400)}
+
+      Storage.put_headlines(panorama_headlines)
+
+      {headline, new_track} = Storage.get_headline(:panorama, time_track)
+      assert headline == {"наступает холодная, пугающая пустота.", nil}
+      assert new_track == {~t(1000), ~t(990), ~t(400)}
     end
   end
 end

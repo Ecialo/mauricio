@@ -53,6 +53,7 @@ defmodule Mauricio.Storage.MongoStorage do
   @spec handle_flush(GenServer.from(), storage()) :: status_reply()
   def handle_flush(_from, storage) do
     Mongo.drop_collection(storage, @coll)
+    Mongo.drop_collection(storage, @news)
     {:reply, :ok, storage}
   end
 
@@ -67,20 +68,16 @@ defmodule Mauricio.Storage.MongoStorage do
     {:reply, :ok, storage}
   end
 
-  def handle_put_headlines(tagged_headlines, storage) do
+  def handle_put_headlines(tagged_headlines, _from, storage) do
     headlines = Enum.map(tagged_headlines, &repack/1)
 
     Mongo.insert_many(storage, @news, headlines, ordered: false)
     |> IO.inspect()
 
-    # Mongo.update_many(storage, @news,
-    # )
-
-    {:noreply, storage}
+    {:reply, :ok, storage}
   end
 
   def handle_get_headline(type, {last, backlog_n, backlog_o} = track, storage) do
-    IO.inspect("GET")
     type = BaseStorage.encode_news_source(type)
     # match_type_stage = %{"$match" => %{"source" => %{"$eq" => type}}}
     # latest = %{}
@@ -144,22 +141,13 @@ defmodule Mauricio.Storage.MongoStorage do
       end
     end
 
-    track =
+    headline_with_track =
       get_last.() ||
         extend_backlog_up.() ||
         extend_backlog_down.() ||
         {empty_news(), track}
 
-    {:reply, track, storage}
-    # with(
-    #   nil <- get_last.(),
-    #   nil <- extend_backlog_down.(),
-    #   nil <- extend_backlog_up.()
-    # ) do
-    #   {empty_news(), track}
-    # else
-    #   {_news, _track} = r -> r
-    # end
+    {:reply, headline_with_track, storage}
   end
 
   defp empty_news do
